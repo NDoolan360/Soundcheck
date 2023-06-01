@@ -12,11 +12,19 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "window": {
+        "close": true,
+        "create": true,
+        "startDragging": true
+      },
+      "clipboard": {
+        "writeText": true
+      }
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Music",
       "copyright": "",
       "deb": {
         "depends": []
@@ -29,7 +37,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "Spotlite",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -55,11 +63,16 @@
     },
     "windows": [
       {
+        "alwaysOnTop": true,
+        "decorations": false,
         "fullscreen": false,
-        "height": 600,
+        "height": 175,
+        "label": "player",
+        "minHeight": 160,
+        "minWidth": 160,
         "resizable": true,
         "title": "Spotlite",
-        "width": 800
+        "width": 360
       }
     ]
   }
