@@ -11,8 +11,8 @@ use crate::Spotify;
 pub async fn get_playback_state(
     state: State<'_, Spotify>,
 ) -> Result<Option<CurrentPlaybackContext>, String> {
-    let spot = state.0.lock().unwrap().clone();
-    spot.current_playback(None, Some([&Track, &Episode]))
+    let spotify = state.0.lock().unwrap().clone();
+    spotify.current_playback(None, Some([&Track, &Episode]))
         .await
         .or_else(|e| Err(format!("{:#?}", e)))
 }
@@ -118,9 +118,9 @@ pub async fn set_repeat(
 pub async fn check_like(track_id: String, state: State<'_, Spotify>) -> Result<bool, String> {
     let limit = 50;
     let mut offset = 0;
-    let spot = state.0.lock().unwrap().clone();
+    let spotify = state.0.lock().unwrap().clone();
     loop {
-        let page = spot
+        let page = spotify
             .current_user_saved_tracks_manual(None, Some(limit), Some(offset))
             .await
             .unwrap();

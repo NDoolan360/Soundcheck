@@ -17,9 +17,9 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<(
             "Auth window was already open, it has now been closed, try again"
         ));
     }
-    let mut spot = state.0.lock().unwrap().clone();
-    match start_server(&window, &mut spot) {
-        Ok(stream) => match handle_connection(stream, &mut spot).await {
+    let mut spotify = state.0.lock().unwrap().clone();
+    match start_server(&window, &mut spotify) {
+        Ok(stream) => match handle_connection(stream, &mut spotify).await {
             Ok(out) => {
                 window.get_window("auth").unwrap().close().unwrap();
                 Ok(out)
@@ -30,16 +30,16 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<(
     }
 }
 
-pub fn start_server(window: &Window, spot: &mut AuthCodePkceSpotify) -> Result<TcpStream, ()> {
+pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Result<TcpStream, ()> {
     let url = WindowUrl::External(
-        spot.get_authorize_url(None)
+        spotify.get_authorize_url(None)
             .expect("Url not generated correctly")
             .parse()
             .unwrap(),
     );
 
     log::info!("Authenticating...");
-    let port = spot
+    let port = spotify
         .get_oauth()
         .redirect_uri
         .split(':')
@@ -54,9 +54,7 @@ pub fn start_server(window: &Window, spot: &mut AuthCodePkceSpotify) -> Result<T
             .unwrap();
     }
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port));
-
-    match listener {
+    match TcpListener::bind(format!("127.0.0.1:{}", port)) {
         // If the bind fails, handle the error and return early.
         Err(e) => {
             // Special print for common case of socket already taken.
@@ -84,7 +82,7 @@ pub fn start_server(window: &Window, spot: &mut AuthCodePkceSpotify) -> Result<T
 
 pub async fn handle_connection(
     mut stream: TcpStream,
-    spot: &mut AuthCodePkceSpotify,
+    spotify: &mut AuthCodePkceSpotify,
 ) -> Result<(), String> {
     let mut buffer = [0; 2048];
     stream.read(&mut buffer).unwrap();
@@ -94,17 +92,23 @@ pub async fn handle_connection(
         Ok(request) => {
             let split: Vec<&str> = request.split_whitespace().collect();
             if split.len() > 1 {
-                let host = &spot.get_oauth().redirect_uri;
+                let host = &spotify.get_oauth().redirect_uri;
                 let path = &split[1].to_string();
-                match spot.parse_response_code(&format!("{}{}", host, path)) {
-                    Some(code) => match spot.request_token(&code).await {
+                match spotify.parse_response_code(&format!("{}{}", host, path)) {
+                    Some(code) => match spotify.request_token(&code).await {
                         Ok(()) => {
                             respond_with_success(stream);
                             Ok(())
                         }
-                        Err(e) => Err(e.to_string()),
+                        Err(e) => {
+                            respond_with_error(format!("Auth server error: {}", e), stream);
+                            Err(e.to_string())
+                        }
                     },
-                    None => Err(format!("Auth server code returned error")),
+                    None => {
+                        respond_with_error("Auth server code returned error".to_string(), stream);
+                        Err(format!("Auth server code returned error"))
+                    }
                 }
             } else {
                 respond_with_error("Malformed request".to_string(), stream);
@@ -119,9 +123,7 @@ pub async fn handle_connection(
 }
 
 fn respond_with_success(mut stream: TcpStream) {
-    let contents = "Success";
-    let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
-
+    let response = format!("HTTP/1.1 200 OK\r\n\r\nSuccess");
     stream.write_all(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
@@ -129,15 +131,14 @@ fn respond_with_success(mut stream: TcpStream) {
 fn respond_with_error(e: String, mut stream: TcpStream) {
     log::error!("Error: {}", e);
     let response = format!("HTTP/1.1 400 Bad Request\r\n\r\n400 - Bad Request - {}", e);
-
     stream.write_all(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
 
 #[command]
 pub async fn is_authenticated(state: State<'_, Spotify>) -> Result<bool, ()> {
-    let spot = state.0.lock().unwrap().clone();
-    match get_cached_token(&spot).await {
+    let spotify = state.0.lock().unwrap().clone();
+    match get_cached_token(&spotify).await {
         Ok(_) => Ok(true),
         Err(_) => Err(()),
     }

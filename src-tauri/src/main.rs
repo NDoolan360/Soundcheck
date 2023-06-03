@@ -14,7 +14,7 @@ use crate::playback::{
 
 use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
 use std::sync::Mutex;
-use tauri::{generate_handler, Builder, Manager};
+use tauri::{generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
 
 pub struct Spotify(Mutex<AuthCodePkceSpotify>);
@@ -24,10 +24,7 @@ fn main() {
     let oauth = OAuth {
         redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
         scopes: scopes!(
-            "user-read-playback-state",
-            "user-modify-playback-state",
-            "user-library-read",
-            "user-library-modify"
+            "user-read-playback-state user-modify-playback-state user-library-read user-library-modify"
         ),
         ..Default::default()
     };
@@ -60,6 +57,11 @@ fn main() {
             let window = app.get_window("player").unwrap();
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
             Ok(())
+        })
+        .on_window_event(|e| {
+            if let WindowEvent::Resized(_) = e.event() {
+                std::thread::sleep(std::time::Duration::from_nanos(1));
+            }
         })
         .plugin(
             tauri_plugin_log::Builder::default()

@@ -149,12 +149,6 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "base64"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ea22880d78093b0cbe17c89f64a7d457941e65759157ec6cb31a31d652b05e5"
-
-[[package]]
-name = "base64"
 version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "604178f6c5c21f02dc555784810edfb88d34ac2c73b2eae109655649ee73ce3d"
@@ -2408,12 +2402,11 @@ dependencies = [
 [[package]]
 name = "rspotify"
 version = "0.11.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c4e72e087489ade8dcbd2ff76ee5963d33e5e98583d244780a094c0626cb74b"
+source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
 dependencies = [
  "async-stream",
  "async-trait",
- "base64 0.20.0",
+ "base64 0.21.2",
  "chrono",
  "futures",
  "getrandom 0.2.9",
@@ -2432,8 +2425,7 @@ dependencies = [
 [[package]]
 name = "rspotify-http"
 version = "0.11.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a801199bba6b992c360e474bed2a500b79ef0e2538f1ece77a60e949ed6e3da8"
+source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
 dependencies = [
  "async-trait",
  "log",
@@ -2446,14 +2438,12 @@ dependencies = [
 [[package]]
 name = "rspotify-macros"
 version = "0.11.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f662a0bbf070fd283985de33ad4d707ae83480230e0e2162953490a97edf203"
+source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
 
 [[package]]
 name = "rspotify-model"
 version = "0.11.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6fbdf1e8fe5fa1bbc0928904941d7c6bcfd235d01a136bb1c0fc01376cf10ec8"
+source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
 dependencies = [
  "chrono",
  "enum_dispatch",
