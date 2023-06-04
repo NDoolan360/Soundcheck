@@ -1,10 +1,7 @@
 use chrono::{Duration, Utc};
 use rspotify::{prelude::*, AuthCodePkceSpotify, ClientError::CacheFile, ClientResult, Token};
-use std::{
-    collections::HashMap,
-    io::{Read, Write},
-    net::{TcpListener, TcpStream},
-};
+use std::io::{Read, Write};
+use std::net::{TcpListener, TcpStream};
 use tauri::{command, Manager, State, Window, WindowUrl};
 
 use crate::Spotify;
@@ -32,7 +29,8 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<(
 
 pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Result<TcpStream, ()> {
     let url = WindowUrl::External(
-        spotify.get_authorize_url(None)
+        spotify
+            .get_authorize_url(None)
             .expect("Url not generated correctly")
             .parse()
             .unwrap(),
@@ -158,7 +156,7 @@ pub async fn get_cached_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Tok
             })
         });
     if token_expired {
-        *spotify.get_token().lock().await.unwrap() = custom_refetch_token(spotify).await?;
+        *spotify.get_token().lock().await.unwrap() = spotify.refetch_token().await?;
         spotify.write_token_cache().await?;
     }
 
@@ -169,24 +167,5 @@ pub async fn get_cached_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Tok
             Ok(cached_token)
         }
         None => Err(CacheFile(format!("No token found in cache"))),
-    }
-}
-
-// Using custom as refresh tokens are not reset, see https://github.com/ramsayleung/rspotify/issues/396
-async fn custom_refetch_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Option<Token>> {
-    match spotify.token.lock().await.unwrap().as_ref() {
-        Some(Token {
-            refresh_token: Some(refresh_token),
-            ..
-        }) => {
-            let mut data = HashMap::<&str, &str>::new();
-            data.insert("grant_type", "refresh_token");
-            data.insert("refresh_token", refresh_token);
-            data.insert("client_id", &spotify.creds.id);
-
-            let new_token = spotify.fetch_access_token(&data, None).await?;
-            Ok(Some(new_token))
-        }
-        _ => Ok(None),
     }
 }
