@@ -1,34 +1,35 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import { readable } from "svelte/store";
+    import { readable, type Readable } from "svelte/store";
     import { fly } from "svelte/transition";
 
     const dispatch = createEventDispatcher();
 
-    export let icon = "";
-    export let active = readable(false);
-    export let disable = readable(false);
-    export let fill = readable(false);
-    export let buttonClass = "small transparent round square no-margin";
-    export let iconClass = "";
+    export let icon: Readable<string> = readable("");
+    export let active: Readable<boolean> = readable(false);
+    export let disable: Readable<boolean> = readable(false);
+    export let fill: Readable<boolean> = readable(false);
+    let _class = "small transparent round square no-margin";
+    export { _class as class };
+    export let iconSize: string = "";
 </script>
 
 <button
+    class={_class}
     in:fly
-    class={buttonClass}
     on:click={() => dispatch("action")}
     disabled={$disable}
 >
-    <slot>
-        <i class={iconClass} class:fill-icon={$fill}>{icon}</i>
+    <slot name="icon">
+        <i class={iconSize} class:fill-icon={$fill}>{$icon}</i>
         {#if $active}
             <i class="indicator fill">circle</i>
         {/if}
     </slot>
+    <slot />
 </button>
 
 <style>
-    /* Turn off disables */
     button {
         height: 2rem;
         width: 2rem;

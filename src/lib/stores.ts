@@ -1,15 +1,15 @@
 import { derived, writable } from 'svelte/store';
-import { pollingWritable } from './PollingWritable';
+import { pollingStore } from './PollingStore';
+import { typeToIcon } from './utils';
 
-export const state = pollingWritable({} as SpotifyApi.CurrentPlaybackResponse | undefined, 5, 4);
-export const like = pollingWritable(false, 5);
-export const authenticated = pollingWritable(false, 1800);
+export const state = pollingStore({} as SpotifyApi.CurrentPlaybackResponse | undefined, 5, 4);
+export const like = pollingStore(false, 5);
+export const authenticated = pollingStore(false, 1800);
 
 export const pageWidth = writable(0);
 
 export const playing = state.derive((state) => state?.is_playing ?? false);
-export const device = state.derive((state) => state?.device ?? { type: 'undefined' } as SpotifyApi.UserDevice);
-export const isEpisode = state.derive((state) => state?.currently_playing_type === 'episode');
+export const isEpisode = state.derive((state) => state?.currently_playing_type == 'episode');
 
 export const disallows = <T>(fn: (values: SpotifyApi.DisallowsObject | undefined) => T) => {
     return derived(state.derive((state) => state?.actions?.disallows), fn);
@@ -23,3 +23,6 @@ export const currentImage = (resolution: (1 | 2 | 3) = 1) => state.derive((state
     }
     return './ambient.gif';
 })
+
+export const device = state.derive((state) => state?.device ?? { type: 'undefined', volume_percent: 0 } as SpotifyApi.UserDevice);
+export const deviceIcon = derived(device, (device: SpotifyApi.UserDevice) => typeToIcon(device.type));

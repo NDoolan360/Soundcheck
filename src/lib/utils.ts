@@ -1,5 +1,16 @@
-// Util for converting a device type to a material icon
-export const deviceToIcon = (device: SpotifyApi.UserDevice) => ((
+// Util for converting raw times to pretty times
+export const prettyTime = (rawTime: number) => {
+    const date = new Date(rawTime);
+    return date.getUTCHours() > 0
+        ? date.toISOString().substring(11, 19)
+        : date.toISOString().substring(14, 19);
+};
+
+// Util for transitioning repeat state
+export const nextRepeat = (state: string) => state === 'off' ? 'context' : state === 'context' ? 'track' : 'off';
+
+// Get a devices Icon
+export const typeToIcon = (type: string) => ((
     {
         unknown: 'device_unknown',
         computer: 'computer',
@@ -22,15 +33,4 @@ export const deviceToIcon = (device: SpotifyApi.UserDevice) => ((
         homething: 'devices_other',
         undefined: 'portable_wifi_off'
     } as { [id: string]: string; }
-)[device.type.toLowerCase().replaceAll(/[^a-z]/g, '')]);
-
-// Util for converting raw times to pretty times
-export const prettyTime = (rawTime: number) => {
-    const date = new Date(rawTime);
-    return date.getUTCHours() > 0
-        ? date.toISOString().substring(11, 19)
-        : date.toISOString().substring(14, 19);
-};
-
-// Util for transitioning repeat state
-export const nextRepeat = (state: string) => state === 'off' ? 'context' : state === 'context' ? 'track' : 'off';
+)[type.toLowerCase().replaceAll(/[^a-z]/g, '')])

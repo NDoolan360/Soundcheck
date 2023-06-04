@@ -1,6 +1,6 @@
 import { derived, writable, type Subscriber, type Writable, type Unsubscriber } from 'svelte/store';
 
-class PollingWritable<T> implements Writable<T> {
+class PollingStore<T> implements Writable<T> {
 	private state: Writable<T>;
 	private interval: number; // in seconds
 	private optCount: number;
@@ -92,6 +92,6 @@ class PollingWritable<T> implements Writable<T> {
 	}
 }
 
-export function pollingWritable<T>(value: T, interval: number, optCount = 0) {
-	return new PollingWritable<T>(value, interval, optCount);
+export function pollingStore<T>(value: T, interval: number, optCount = 0) {
+	return new PollingStore<T>(value, interval, optCount);
 }
