@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { duration, playing, progress } from "$lib/stores";
 	import { prettyTime } from "$lib/utils";
 	import { afterUpdate, createEventDispatcher } from "svelte";
 	import { writable } from "svelte/store";
@@ -12,13 +13,9 @@
 	let thumbProgress: number;
 	let sliderWidth: number;
 
-	const progress = writable(0);
-	const duration = writable(100000);
-	const playing = writable(true);
-
 	afterUpdate(() => {
 		if (!scrubbing && progressBar?.value != undefined)
-			progressBar.value = $progress.toString();
+			progressBar.value = ($progress ?? 0).toString();
 	});
 
 	$: if (!scrubbing) {

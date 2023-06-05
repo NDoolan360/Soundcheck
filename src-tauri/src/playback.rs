@@ -12,7 +12,8 @@ pub async fn get_playback_state(
     state: State<'_, Spotify>,
 ) -> Result<Option<CurrentPlaybackContext>, String> {
     let spotify = state.0.lock().unwrap().clone();
-    spotify.current_playback(None, Some([&Track, &Episode]))
+    spotify
+        .current_playback(None, Some([&Track, &Episode]))
         .await
         .or_else(|e| Err(format!("{:#?}", e)))
 }
@@ -71,12 +72,12 @@ pub async fn previous_track(state: State<'_, Spotify>) -> Result<(), String> {
 }
 
 #[command]
-pub async fn seek(progress: u32, state: State<'_, Spotify>) -> Result<(), String> {
+pub async fn seek(progress: u32, state: State<'_, Spotify>) -> Result<u32, String> {
     let spotify = state.0.lock().unwrap().clone();
     let duration = chrono::Duration::milliseconds(progress.into());
     let out = spotify.seek_track(duration, None).await;
     match out {
-        Ok(_) => Ok(()),
+        Ok(_) => Ok(progress),
         Err(e) => Err(format!("{:#?}", e)),
     }
 }
