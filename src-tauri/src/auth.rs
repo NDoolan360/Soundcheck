@@ -2,7 +2,7 @@ use chrono::{Duration, Utc};
 use rspotify::{prelude::*, AuthCodePkceSpotify, ClientError::CacheFile, ClientResult, Token};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
-use tauri::{command, Manager, State, Window, WindowUrl};
+use tauri::{command, Manager, State, Window, WindowEvent, WindowUrl};
 
 use crate::Spotify;
 
@@ -44,12 +44,19 @@ pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Resul
         .last()
         .expect("Could not find port in redirect URI.");
 
+    let borrowed_window = window.clone();
     if window.get_window("auth").is_none() {
         tauri::WindowBuilder::new(window, "auth", url)
             .title("Spotify Authorisation")
             .focused(true)
+            .always_on_top(true)
             .build()
-            .unwrap();
+            .unwrap()
+            .on_window_event(move |e| {
+                if let WindowEvent::CloseRequested { .. } = e {
+                    let _ = borrowed_window.close();
+                }
+            })
     }
 
     match TcpListener::bind(format!("127.0.0.1:{}", port)) {
