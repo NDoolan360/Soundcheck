@@ -2402,7 +2402,7 @@ dependencies = [
 [[package]]
 name = "rspotify"
 version = "0.11.7"
-source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
+source = "git+https://github.com/ramsayleung/rspotify?branch=ramsay/fix-pkce-refresh-token#e2992335d2196f66271536dcbd062e3b7ef1ae9c"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -2425,7 +2425,7 @@ dependencies = [
 [[package]]
 name = "rspotify-http"
 version = "0.11.7"
-source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
+source = "git+https://github.com/ramsayleung/rspotify?branch=ramsay/fix-pkce-refresh-token#e2992335d2196f66271536dcbd062e3b7ef1ae9c"
 dependencies = [
  "async-trait",
  "log",
@@ -2438,12 +2438,12 @@ dependencies = [
 [[package]]
 name = "rspotify-macros"
 version = "0.11.7"
-source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
+source = "git+https://github.com/ramsayleung/rspotify?branch=ramsay/fix-pkce-refresh-token#e2992335d2196f66271536dcbd062e3b7ef1ae9c"
 
 [[package]]
 name = "rspotify-model"
 version = "0.11.7"
-source = "git+https://github.com/NDoolan360/rspotify?branch=master#08387401aace34b7e807a78d2f9be3cb48d94da4"
+source = "git+https://github.com/ramsayleung/rspotify?branch=ramsay/fix-pkce-refresh-token#e2992335d2196f66271536dcbd062e3b7ef1ae9c"
 dependencies = [
  "chrono",
  "enum_dispatch",
