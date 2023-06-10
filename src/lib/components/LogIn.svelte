@@ -1,17 +1,11 @@
 <script lang="ts">
 	import { authenticated } from "$lib/stores";
-	import { invoke } from "@tauri-apps/api";
-	import { appWindow } from "@tauri-apps/api/window";
 
 	let loading: boolean = false;
-	const authenticate = () => {
+	const authenticate = async () => {
 		loading = true;
-		invoke("authenticate", { window: appWindow })
-			.then(() => {
-				$authenticated = true;
-			})
-			.catch(console.error)
-			.finally(() => (loading = false));
+		await authenticated.set(false);
+		loading = false;
 	};
 </script>
 

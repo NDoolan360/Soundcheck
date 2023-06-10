@@ -7,23 +7,35 @@ use tauri::{command, Manager, State, Window, WindowEvent, WindowUrl};
 use crate::Spotify;
 
 #[command]
-pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<(), String> {
+pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<bool, String> {
+    if let Ok(true) = is_authenticated(state.clone()).await {
+        return Ok(true);
+    }
     if let Some(auth_window) = window.get_window("auth") {
-        auth_window.close().unwrap();
+        auth_window.set_focus().unwrap();
         return Err(format!(
-            "Auth window was already open, it has now been closed, try again"
+            "Auth window is already open, try again"
         ));
     }
     let mut spotify = state.0.lock().unwrap().clone();
     match start_server(&window, &mut spotify) {
         Ok(stream) => match handle_connection(stream, &mut spotify).await {
-            Ok(out) => {
+            Ok(_) => {
                 window.get_window("auth").unwrap().close().unwrap();
-                Ok(out)
+                Ok(true)
             }
             Err(e) => Err(e),
         },
         Err(()) => Err(format!("Auth server stream error")),
+    }
+}
+
+#[command]
+pub async fn is_authenticated(state: State<'_, Spotify>) -> Result<bool, ()> {
+    let spotify = state.0.lock().unwrap().clone();
+    match get_cached_token(&spotify).await {
+        Ok(_) => Ok(true),
+        Err(_) => Err(()),
     }
 }
 
@@ -140,15 +152,6 @@ fn respond_with_error(e: String, mut stream: TcpStream) {
     stream.flush().unwrap();
 }
 
-#[command]
-pub async fn is_authenticated(state: State<'_, Spotify>) -> Result<bool, ()> {
-    let spotify = state.0.lock().unwrap().clone();
-    match get_cached_token(&spotify).await {
-        Ok(_) => Ok(true),
-        Err(_) => Err(()),
-    }
-}
-
 pub async fn get_cached_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Token> {
     // if expired refetch and cache
     let token_expired = spotify
@@ -159,7 +162,7 @@ pub async fn get_cached_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Tok
         .as_ref()
         .map_or(true, |token| {
             token.expires_at.map_or(true, |expiration| {
-                Utc::now() + Duration::minutes(10) >= expiration
+                Utc::now() + Duration::minutes(30) >= expiration
             })
         });
     if token_expired {

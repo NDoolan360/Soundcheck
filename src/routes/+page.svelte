@@ -10,41 +10,16 @@
 	import { mainMenu, spotifyWavePath } from "$lib/menu";
 	import {
 		authenticated,
-		deviceIcon,
-		like,
+		autoPoll,
 		pageWidth,
-		playing,
-		progress as progress_ms,
 		state,
+		playing,
+		optimisticProgress,
 	} from "$lib/stores";
-	import { callFunctionWhen, prettyTime, typeToIcon } from "$lib/utils";
-	import { invoke } from "@tauri-apps/api";
-	import { onDestroy, onMount } from "svelte";
-	import { derived } from "svelte/store";
-
-	const unsubState = callFunctionWhen(authenticated, () =>
-		invoke<SpotifyApi.CurrentPlaybackResponse>("get_playback_state")
-			.then(state.set)
-			.catch(console.error)
-	);
-	const unsubKeepAlive = callFunctionWhen(
-		derived(playing, (p) => !p),
-		() => {
-			console.info(prettyTime(Date.now()), "ping");
-			const progress = $progress_ms ?? 0;
-			invoke<number>("seek", { progress })
-				.then(progress_ms.set)
-				.catch(console.error);
-		},
-		25000
-	);
-	const unsubLike = callFunctionWhen(playing, () => {
-		const trackId = $state?.item?.id;
-		if (!trackId) return;
-		invoke<boolean>("check_like", { trackId })
-			.then(like.set)
-			.catch(console.error);
-	});
+	import { deviceTypeToIcon } from "$lib/utils";
+	import { safeLoad } from "@square/svelte-store";
+	import { onMount } from "svelte";
+	import { derived } from "@square/svelte-store";
 
 	let widthInterval: number;
 	onMount(() => {
@@ -52,12 +27,13 @@
 			() => pageWidth.set(window.innerWidth),
 			250
 		);
-	});
-	onDestroy(() => {
-		clearInterval(widthInterval);
-		unsubState();
-		unsubKeepAlive();
-		unsubLike();
+		const clearAutoPoll = autoPoll(5000);
+		const stopOptimiticUpdate = optimisticProgress(1000);
+		return () => {
+			clearInterval(widthInterval);
+			clearAutoPoll();
+			stopOptimiticUpdate();
+		};
 	});
 </script>
 
@@ -72,11 +48,14 @@
 			<MenuItem {...item} />
 		{/each}
 	</Menu>
-	<Menu icon={deviceIcon} align="left">
+	<Menu
+		icon={derived(state, (state) => deviceTypeToIcon(state?.device?.type))}
+		align="left"
+	>
 		<VolumeControl />
 		{#each { length: 2 } as device}
 			<MenuItem
-				icon={typeToIcon("computer")}
+				icon={deviceTypeToIcon("computer")}
 				text={"Example Device"}
 				action={() => {}}
 			/>
@@ -85,12 +64,14 @@
 </nav>
 
 <main class="fixed middle row margin-sides small-margin center-align">
-	{#if !$authenticated}
-		<LogIn />
-	{:else}
-		<TrackInfo />
-		<ActionButton />
-	{/if}
+	{#await safeLoad(authenticated) then}
+		{#if !$authenticated}
+			<LogIn />
+		{:else}
+			<TrackInfo />
+			<ActionButton />
+		{/if}
+	{/await}
 </main>
 
 <nav class="bottom align-center transparent no-padding small-margin">

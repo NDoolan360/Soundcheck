@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { duration, playing, progress } from "$lib/stores";
+	import {
+		displayedProgress,
+		duration,
+		playing,
+	} from "$lib/stores";
 	import { prettyTime } from "$lib/utils";
 	import { afterUpdate, createEventDispatcher } from "svelte";
 	import { writable } from "svelte/store";
@@ -15,12 +19,11 @@
 
 	afterUpdate(() => {
 		if (!scrubbing && progressBar?.value != undefined)
-			progressBar.value = ($progress ?? 0).toString();
+			progressBar.value = ($displayedProgress ?? 0).toString();
 	});
 
-	$: if (!scrubbing) {
-		thumbProgress = $progress;
-	}
+	$: if (!scrubbing) thumbProgress = $displayedProgress;
+
 	$: thumbCenter =
 		(!$duration ? 0 : thumbProgress / $duration) * (sliderWidth - 6) + 3;
 	$: disabled = $disable || $duration == 0;
@@ -43,7 +46,6 @@
 			on:change={() => {
 				scrubbing = false;
 				dispatch("action", Number(progressBar.value));
-				$progress = Number(progressBar.value);
 			}}
 			on:input={() => {
 				scrubbing = true;

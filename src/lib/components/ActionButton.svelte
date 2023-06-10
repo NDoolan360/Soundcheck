@@ -1,17 +1,10 @@
 <script lang="ts">
 	import IconButton from "$lib/components/IconButton.svelte";
 	import { lowerControls } from "$lib/controls";
-	import { disallows, playing } from "$lib/stores";
-	import { invoke } from "@tauri-apps/api";
-	import { derived } from "svelte/store";
+	import { disallows, liked, playing, state } from "$lib/stores";
+	import { derived } from "@square/svelte-store";
 
-	const action = () => {
-		const playState = !$playing;
-		playing.set(playState);
-		invoke<boolean>("set_playing", { playState })
-			.then(playing.set)
-			.catch(console.error);
-	};
+	const action = () => ($playing = !$playing);
 </script>
 
 {#if !$lowerControls.find((c) => c.id == "play_pause")}

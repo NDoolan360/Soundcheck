@@ -8,8 +8,8 @@ use crate::auth::{authenticate, is_authenticated};
 
 mod playback;
 use crate::playback::{
-    check_like, get_device_list, get_playback_state, next_track, previous_track, seek, set_device,
-    set_like, set_playing, set_repeat, set_shuffle, set_volume,
+    check_liked, get_device_list, get_playback_state, next_track, previous_track, seek, set_device,
+    set_liked, set_playing, set_repeat, set_shuffle, set_volume,
 };
 
 use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
@@ -42,11 +42,11 @@ fn main() {
             is_authenticated,
             get_playback_state,
             get_device_list,
-            check_like,
+            check_liked,
             next_track,
             previous_track,
             seek,
-            set_like,
+            set_liked,
             set_playing,
             set_repeat,
             set_shuffle,

@@ -1,18 +1,16 @@
 <script lang="ts">
-	import { state } from "$lib/stores";
-	import { derived } from "svelte/store";
+	import { currentItem, currentType, state, trackId } from "$lib/stores";
+	import { derived, get } from "@square/svelte-store";
 
-	let title = derived(state, (s) => s?.item?.name ?? "");
-	let subheading = derived(state, (s) => {
-		switch (s?.currently_playing_type) {
-			case "track":
-				return (s?.item as SpotifyApi.TrackObjectFull).artists
-					.map((a) => a.name)
-					.join(", ");
-			case "episode":
-				return (s?.item as SpotifyApi.EpisodeObject).show.name ?? "";
-		}
-		return "";
+	let title = derived(currentItem, ($i) => $i?.name ?? "");
+	let subheading = derived(trackId, () => {
+		if (get(currentType) == "episode")
+			return (<SpotifyApi.EpisodeObject>get(currentItem)).show.name ?? "";
+		else if (get(currentType) == "track")
+			return (<SpotifyApi.TrackObjectFull>get(currentItem)).artists
+				.map((a) => a.name)
+				.join(", ");
+		else return "";
 	});
 </script>
 

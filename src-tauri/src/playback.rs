@@ -116,7 +116,7 @@ pub async fn set_repeat(
 }
 
 #[command]
-pub async fn check_like(track_id: String, state: State<'_, Spotify>) -> Result<bool, String> {
+pub async fn check_liked(track_id: String, state: State<'_, Spotify>) -> Result<bool, String> {
     let limit = 50;
     let mut offset = 0;
     let spotify = state.0.lock().unwrap().clone();
@@ -142,13 +142,13 @@ pub async fn check_like(track_id: String, state: State<'_, Spotify>) -> Result<b
 }
 
 #[command]
-pub async fn set_like(
+pub async fn set_liked(
     track_id: String,
-    like_state: bool,
+    liked_state: bool,
     state: State<'_, Spotify>,
 ) -> Result<bool, String> {
     let spotify = state.0.lock().unwrap().clone();
-    let out = match like_state {
+    let out = match liked_state {
         false => {
             spotify
                 .current_user_saved_tracks_delete(vec![TrackId::from_id(&track_id).unwrap()])
@@ -161,7 +161,7 @@ pub async fn set_like(
         }
     };
     match out {
-        Ok(()) => Ok(like_state),
+        Ok(()) => Ok(liked_state),
         Err(e) => Err(format!("{:?}", e)),
     }
 }

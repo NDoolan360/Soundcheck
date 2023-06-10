@@ -1,27 +1,20 @@
 <script lang="ts">
-	import { device, deviceIcon, volume } from "$lib/stores";
-	import { throttle } from "$lib/utils";
-	import { invoke } from "@tauri-apps/api";
+	import { state, volume } from "$lib/stores";
+	import { afterUpdate } from "svelte";
 
 	let slider: HTMLInputElement;
+	let scrubbing = false;
+	let thumbProgress: number;
 	let sliderWidth: number;
-	let thumbCenter: string;
 
-	const inputAction = (e: { currentTarget: HTMLInputElement }) => {
-		const volumePercent = Number(e.currentTarget.value);
-		volume.set(volumePercent);
-		throttle(() => {
-			invoke<number>("set_volume", { volumePercent })
-				.then(volume.set)
-				.catch(console.error);
-		}, 300)();
-	};
+	$: if (!scrubbing) thumbProgress = $volume;
 
-	$: if ($volume != undefined)
-		thumbCenter = ($volume / 100) * (sliderWidth - 30) + 10 + "px";
+	$: thumbCenter = (thumbProgress / 100) * (sliderWidth - 30) + 10;
 
-	const forbiddenTypes = ["smartphone"];
-	$: disabled = !$device.is_active || forbiddenTypes.includes($deviceIcon);
+	const restrictedInputTypes = ["smartphone"];
+	$: disabled =
+		!$state?.device?.is_active ||
+		restrictedInputTypes.includes($state?.device?.type);
 </script>
 
 <label
@@ -30,10 +23,17 @@
 >
 	<input
 		bind:this={slider}
-		on:input={inputAction}
+		on:change={() => {
+			scrubbing = false;
+			$volume = Number(slider.value);
+		}}
+		on:input={() => {
+			scrubbing = true;
+			thumbProgress = Number(slider.value);
+		}}
 		type="range"
 		value={$volume}
-		style:--value={thumbCenter}
+		style:--value="{thumbCenter}px"
 		max="100"
 		step="5"
 		{disabled}
@@ -42,15 +42,15 @@
 		<i class="tiny fill">
 			{#if disabled}
 				volume_off
-			{:else if $device.volume_percent == 0}
+			{:else if $state?.device.volume_percent == 0}
 				volume_mute
-			{:else if ($device.volume_percent ?? 0) < 50}
+			{:else if ($state?.device.volume_percent ?? 0) < 50}
 				volume_down
 			{:else}
 				volume_up
 			{/if}
 		</i>
-		{$device.name ?? ""}
+		{$state?.device.name ?? ""}
 	</span>
 </label>
 

@@ -10,21 +10,8 @@ export const prettyTime = (rawTime: number) => {
 export const nextRepeat = (state: string) =>
 	state === "off" ? "context" : state === "context" ? "track" : "off";
 
-// throttles calls to func
-// https://stackoverflow.com/questions/27078285/simple-throttle-in-javascript#27078401
-export function throttle(func: () => void, delay: number) {
-	let lastTime = 0;
-	return function () {
-		const now = Date.now();
-		if (lastTime + delay <= now) {
-			func();
-			lastTime = now;
-		}
-	};
-}
-
 // Get a devices Icon
-export const typeToIcon = (type: string) =>
+export const deviceTypeToIcon = (type: string | undefined) =>
 	((
 		{
 			unknown: "device_unknown",
@@ -48,36 +35,4 @@ export const typeToIcon = (type: string) =>
 			homething: "devices_other",
 			undefined: "portable_wifi_off",
 		} as { [id: string]: string }
-	)[type.toLowerCase().replaceAll(/[^a-z]/g, "")]);
-
-import { get, type Readable, type Unsubscriber } from "svelte/store";
-
-export function callFunctionWhen(
-	condition: Readable<boolean>,
-	callback: () => void,
-	interval: number = 5000
-): Unsubscriber {
-	let intervalId: number | null = null;
-
-	const unsubscribe = condition.subscribe((value: boolean) => {
-		if (value) {
-			if (!intervalId) {
-				intervalId = setInterval(() => {
-					if (get(condition)) callback();
-				}, interval);
-			}
-		} else stopInterval();
-	});
-
-	function stopInterval() {
-		if (intervalId) {
-			clearInterval(intervalId);
-			intervalId = null;
-		}
-	};
-
-	return () => {
-		stopInterval();
-		unsubscribe();
-	};
-}
+	)[(type ?? "undefined").toLowerCase().replaceAll(/[^a-z]/g, "")]);

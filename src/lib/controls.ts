@@ -1,24 +1,27 @@
-import { derived, get, readable, type Readable } from "svelte/store";
+import IconButton from "$lib/components/IconButton.svelte";
+import ProgressBar from "$lib/components/ProgressBar.svelte";
+import { derived } from "@square/svelte-store";
+import { invoke } from "@tauri-apps/api";
+import type { ComponentType } from "svelte";
+import { get, readable, type Readable } from "svelte/store";
 import {
+	currentType,
 	disallows,
-	isEpisode,
-	like,
+	duration,
+	liked,
 	pageWidth,
 	playing,
+	progress,
 	repeat,
 	shuffle,
 	state,
-	type RepeatState,
+	trackId,
 } from "./stores";
-import type { ComponentType } from "svelte";
-import IconButton from "$lib/components/IconButton.svelte";
-import ProgressBar from "$lib/components/ProgressBar.svelte";
-import { invoke } from "@tauri-apps/api";
 import { nextRepeat } from "./utils";
 
 type Control = {
 	component: ComponentType;
-	action: () => void;
+	action: (value?: any) => void;
 	wrapperClass?: string;
 	props: {
 		icon?: Readable<string>;
@@ -28,8 +31,8 @@ type Control = {
 	};
 };
 
-const controlMap = derived(isEpisode, (isEpisode) =>
-	!isEpisode
+const controlMap = derived(currentType, (currentType) =>
+	currentType == undefined || currentType == "track"
 		? {
 				prev: [0, Infinity],
 				play_pause: [0, 250],
@@ -52,7 +55,7 @@ const controlMap = derived(isEpisode, (isEpisode) =>
 const controls = {
 	replay_30: {
 		component: IconButton,
-		action: () => {},
+		action: () => progress.update((p) => Math.max(0, p - 30000)),
 		props: {
 			icon: readable("replay_30"),
 			disable: derived(disallows, (d) => !d || d.seeking),
@@ -60,7 +63,8 @@ const controls = {
 	},
 	prev: {
 		component: IconButton,
-		action: () => {},
+		action: () =>
+			invoke("previous_track").finally(() => state && state.reload!()),
 		props: {
 			icon: readable("skip_previous"),
 			disable: derived(disallows, (d) => !d || d.skipping_prev),
@@ -68,7 +72,7 @@ const controls = {
 	},
 	progress: {
 		component: ProgressBar,
-		action: () => {},
+		action: ({ detail }) => progress.set(detail),
 		wrapperClass: "max row",
 		props: {
 			disable: derived(disallows, (d) => !d || d.seeking),
@@ -76,23 +80,16 @@ const controls = {
 	},
 	play_pause: {
 		component: IconButton,
-		action: () => {
-			const playState = !get(playing);
-			playing.set(playState);
-			invoke<boolean>("set_playing", { playState })
-				.then(playing.set)
-				.catch(console.error);
-		},
+		action: () => playing.update((p) => !p),
 		props: {
-			icon: derived(state, (s) =>
-				s?.is_playing ? "pause" : "play_arrow"
-			),
-			disable: derived(disallows, (d) => !d),
+			icon: derived(playing, (p) => (p ? "pause" : "play_arrow")),
+			disable: derived(disallows, ($d) => !$d),
 		},
 	},
 	next: {
 		component: IconButton,
-		action: () => {},
+		action: () =>
+			invoke("next_track").finally(() => state && state.reload!()),
 		props: {
 			icon: readable("skip_next"),
 			disable: derived(disallows, (d) => !d || d.skipping_next),
@@ -100,7 +97,8 @@ const controls = {
 	},
 	forward_30: {
 		component: IconButton,
-		action: () => {},
+		action: () =>
+			progress.update((p) => Math.min(p + 30000, get(duration))),
 		props: {
 			icon: readable("forward_30"),
 			disable: derived(disallows, (d) => !d || d.seeking),
@@ -108,33 +106,21 @@ const controls = {
 	},
 	shuffle: {
 		component: IconButton,
-		action: () => {
-			const shuffleState = !get(shuffle);
-			shuffle.set(shuffleState);
-			invoke<boolean>("set_shuffle", { shuffleState })
-				.then(shuffle.set)
-				.catch(console.error);
-		},
+		action: () => shuffle.update((s) => !s),
 		props: {
 			icon: readable("shuffle"),
-			active: derived(state, (s) => s?.shuffle_state ?? false),
+			active: shuffle,
 			disable: derived(disallows, (d) => !d || d.toggling_shuffle),
 		},
 	},
 	repeat: {
 		component: IconButton,
-		action: () => {
-			const repeatState = nextRepeat(get(repeat));
-			repeat.set(repeatState);
-			invoke<RepeatState>("set_repeat", { repeatState })
-				.then(repeat.set)
-				.catch(console.error);
-		},
+		action: () => repeat.update(nextRepeat),
 		props: {
-			icon: derived(state, (state) =>
-				state?.repeat_state == "track" ? "repeat_one" : "repeat"
+			icon: derived(repeat, (r) =>
+				r == "track" ? "repeat_one" : "repeat"
 			),
-			active: derived(state, (s) => (s?.repeat_state ?? "off") != "off"),
+			active: derived(repeat, (r) => (r ?? "off") != "off"),
 			disable: derived(
 				disallows,
 				(d) =>
@@ -144,18 +130,11 @@ const controls = {
 	},
 	favourite: {
 		component: IconButton,
-		action: () => {
-			const likeState = !get(like);
-			const trackId = get(state)?.item?.id;
-			like.update((v) => !v);
-			invoke<boolean>("set_like", { likeState, trackId })
-				.then(like.set)
-				.catch(console.error);
-		},
+		action: () => liked.update((l) => !l),
 		props: {
 			icon: readable("favorite"),
-			disable: derived(state, (s) => s?.item?.id == undefined),
-			fill: like,
+			disable: derived(trackId, ($t) => $t == undefined),
+			fill: liked,
 		},
 	},
 } as { [key: string]: Control };
