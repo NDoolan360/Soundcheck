@@ -42,7 +42,7 @@
 			{disabled}
 		/>
 	</span>
-	<span class="icon">
+	<span class="icon" class:disabled>
 		{#if disabled}
 			<VolumeX size={iconSize} />
 		{:else if thumbProgress == 0}
@@ -95,6 +95,9 @@
 		align-items: center;
 		justify-content: center;
 		pointer-events: none;
+	}
+	.icon.disabled {
+		color: var(--primary-container);
 	}
 	.slider:disabled {
 		background: var(--active);

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { slide } from "svelte/transition";
 	import Button from "../button";
 	import { getMenuOptions } from "./context";
 
@@ -10,7 +9,7 @@
 	export let color: string | undefined = undefined;
 </script>
 
-<li role="menuitem" id={uid} transition:slide>
+<li role="menuitem" id={uid}>
 	<Button shape="square" height="calc({size} + 0.5rem)" width="100%" {background} {color} on:click>
 		<slot name="icon" />
 		<slot slot="extend" />

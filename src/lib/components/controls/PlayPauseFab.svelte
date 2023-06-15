@@ -7,12 +7,12 @@
 
 {#if !$controls.find((c) => c.id == "play_pause")}
 	<Button
-		size="5rem"
+		size="4rem"
 		on:click={() => ($playing = !$playing)}
 		shape={$playing ? undefined : "circle"}
 		disable={derived(disallows, (d) => !d)}
 	>
-		<svg height="2.5rem" viewBox="0 0 24 24" class="tiny">
+		<svg height="2rem" viewBox="0 0 24 24" class="tiny">
 			<path
 				d={$playing
 					? "M6 19 10 19 10 5 6 5ZM14 19 18 19 18 5 14 5Z"

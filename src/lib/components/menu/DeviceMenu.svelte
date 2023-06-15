@@ -9,9 +9,8 @@
 
 <Menu rightAlign>
 	<Button slot="button">
-		<!-- disable={derived(state, (s) => !s?.device)} -->
 		<svelte:component this={deviceTypeToIcon($state?.device?.type)} size="1rem" />
-		<span slot="extend">{$state?.device?.name}</span>
+		<span slot="extend">{$state?.device?.name ?? "Not connected"}</span>
 	</Button>
 	<VolumeControl slot="header" />
 	{#await devices.reload && devices.reload() then}

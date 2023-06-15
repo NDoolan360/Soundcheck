@@ -99,7 +99,7 @@
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-image: var(--background-image);
+		background-image: var(--background-image, url("./ambient.gif"));
 		background-size: cover;
 		background-position: center;
 		opacity: 0.8;

@@ -16,7 +16,9 @@ import { derived } from "@square/svelte-store";
 import { invoke } from "@tauri-apps/api";
 import {
 	Heart,
+	Pause,
 	PauseCircle,
+	Play,
 	PlayCircle,
 	Repeat,
 	Repeat1,
@@ -24,7 +26,7 @@ import {
 	RotateCw,
 	Shuffle,
 	SkipBack,
-	SkipForward
+	SkipForward,
 } from "lucide-svelte";
 import type { ComponentType } from "svelte";
 import { get, readable, type Readable } from "svelte/store";
@@ -42,26 +44,29 @@ type Control = {
 	};
 };
 
-const controlMap = derived(currentType, (currentType) =>
-	currentType == undefined || currentType == "track"
-		? {
-				prev: [0, Infinity],
-				play_pause: [0, 250],
-				progress: [320, Infinity],
-				next: [0, Infinity],
-				favourite: [0, Infinity],
-				shuffle: [190, Infinity],
-				repeat: [250, Infinity],
-		  }
-		: {
-				replay_30: [0, Infinity],
-				prev: [190, Infinity],
-				play_pause: [0, 250],
-				progress: [320, Infinity],
-				next: [0, Infinity],
-				forward_30: [0, Infinity],
-		  }
-);
+const controlMap = derived(currentType, (currentType) => {
+	return {
+		track: {
+			prev: [0, Infinity],
+			play_pause: [0, 250],
+			progress: [320, Infinity],
+			next: [0, Infinity],
+			shuffle: [190, Infinity],
+			repeat: [380, Infinity],
+			favourite: [0, Infinity],
+		},
+		episode: {
+			replay_30: [0, Infinity],
+			prev: [190, Infinity],
+			play_pause: [0, 250],
+			progress: [320, Infinity],
+			next: [0, Infinity],
+			forward_30: [0, Infinity],
+		},
+		ad: {},
+		unknown: {},
+	}[currentType ?? "track"];
+});
 
 const control_list = {
 	replay_30: {
@@ -94,7 +99,7 @@ const control_list = {
 		component: DynamicIcon,
 		click: () => playing.update((p) => !p),
 		props: {
-			icon: derived(playing, (p) => (p ? PauseCircle : PlayCircle)),
+			icon: derived(playing, (p) => (p ? Pause : Play)),
 			disable: derived(disallows, ($d) => !$d),
 		},
 	},
