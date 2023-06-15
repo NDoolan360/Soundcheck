@@ -1,31 +1,28 @@
 <script lang="ts">
-	import ActionButton from "$lib/components/ActionButton.svelte";
-	import Controls from "$lib/components/Controls.svelte";
-	import DynamicBackground from "$lib/components/DynamicBackground.svelte";
-	import LogIn from "$lib/components/LogIn.svelte";
-	import Menu from "$lib/components/Menu.svelte";
-	import MenuItem from "$lib/components/MenuItem.svelte";
-	import TrackInfo from "$lib/components/TrackInfo.svelte";
-	import VolumeControl from "$lib/components/VolumeControl.svelte";
-	import { mainMenu, spotifyWavePath } from "$lib/menu";
+	import { LogIn } from "$lib/components/button";
+	import { Row, Stack } from "$lib/components/container";
+	import { ControlBar, PlayPauseFab } from "$lib/components/controls";
+	import { DeviceMenu, MainMenu } from "$lib/components/menu";
 	import {
 		authenticated,
 		autoPoll,
-		pageWidth,
-		state,
-		playing,
+		images,
 		optimisticProgress,
+		pageWidth,
+		preventWidthUpdate,
+		subheading,
+		title,
 	} from "$lib/stores";
-	import { deviceTypeToIcon } from "$lib/utils";
+	import { toCss } from "$lib/utils";
 	import { safeLoad } from "@square/svelte-store";
+	import "material-dynamic-colors";
 	import { onMount } from "svelte";
-	import { derived } from "@square/svelte-store";
+	import { get } from "svelte/store";
 
-	let widthInterval: number;
 	onMount(() => {
-		widthInterval = setInterval(
-			() => pageWidth.set(window.innerWidth),
-			250
+		const widthInterval = setInterval(
+			() => !$preventWidthUpdate && pageWidth.set(window.innerWidth),
+			150
 		);
 		const clearAutoPoll = autoPoll(5000);
 		const stopOptimiticUpdate = optimisticProgress(1000);
@@ -35,73 +32,77 @@
 			stopOptimiticUpdate();
 		};
 	});
+
+	$: materialDynamicColors($images[2].url).then((colors) => {
+		document.body.setAttribute(
+			"style",
+			`--background-image: url(${get(images)[0].url});` +
+				toCss(colors.dark)
+		);
+	});
 </script>
 
-<DynamicBackground />
-<div class="fixed drag-region" data-tauri-drag-region />
-<nav class="top transparent no-padding small-margin">
-	<Menu align="right">
-		<svg slot="icon" viewBox="0 0 240 240">
-			<path d={spotifyWavePath} />
-		</svg>
-		{#each mainMenu as item}
-			<MenuItem {...item} />
-		{/each}
-	</Menu>
-	<Menu
-		icon={derived(state, (state) => deviceTypeToIcon(state?.device?.type))}
-		align="left"
-	>
-		<VolumeControl />
-		{#each { length: 2 } as device}
-			<MenuItem
-				icon={deviceTypeToIcon("computer")}
-				text={"Example Device"}
-				action={() => {}}
-			/>
-		{/each}
-	</Menu>
-</nav>
-
-<main class="fixed middle row margin-sides small-margin center-align">
-	{#await safeLoad(authenticated) then}
-		{#if !$authenticated}
-			<LogIn />
-		{:else}
-			<TrackInfo />
-			<ActionButton />
-		{/if}
-	{/await}
-</main>
-
-<nav class="bottom align-center transparent no-padding small-margin">
-	<Controls />
-</nav>
+<Stack height="100vh" width="100vw" margin="0.35rem" padding="0.35rem">
+	<Row>
+		<MainMenu />
+		<DeviceMenu />
+	</Row>
+	<Row center={!$authenticated}>
+		{#await safeLoad(authenticated) then}
+			{#if !$authenticated}
+				<LogIn />
+			{:else}
+				<hgroup style:color="white">
+					<h3>{$title}</h3>
+					<p>{$subheading}</p>
+				</hgroup>
+				<PlayPauseFab />
+			{/if}
+		{/await}
+	</Row>
+	<ControlBar />
+</Stack>
 
 <style>
-	nav {
-		height: fit-content;
-		gap: clamp(0px, calc(11.5vw - 18.4px), 1rem);
-		justify-content: space-between;
+	hgroup {
+		pointer-events: none;
+		flex: 1 1 auto;
+		overflow: hidden;
+		user-select: none;
+		mask-image: linear-gradient(90deg, #000 90%, transparent);
+		-webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
 	}
-	nav,
-	main {
-		width: calc(100% - 1rem);
-		left: 50%;
-		translate: calc(-50% - 0.5rem);
-		max-width: 600px;
-		pointer-events: none; /* allow drag region */
+
+	:global(:root) {
+		--speed: 0.3s;
+		--elevate: 0 0.25rem 0.5rem 0 rgb(0 0 0 / 0.4);
 	}
-	nav.bottom {
-		z-index: 99;
+
+	:global(*) {
+		margin: 0;
+		padding: 0;
+		position: relative;
+		white-space: nowrap;
+		box-sizing: border-box;
 	}
-	:global(:not(nav, main, hgroup)) {
-		pointer-events: all; /* ignore drag region */
+
+	:global(html, body) {
+		height: 100vh;
+		overflow: hidden;
 	}
-	.drag-region {
-		top: 0.3rem;
-		bottom: 0.3rem;
-		left: 0.3rem;
-		right: 0.3rem;
+	:global(body) {
+		font-family: Roboto, "Arial Nova", Arial, sans-serif;
+		background-color: var(--on-primary);
+	}
+	:global(body::before) {
+		content: "";
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background-image: var(--background-image);
+		background-size: cover;
+		background-position: center;
+		opacity: 0.8;
+		box-shadow: inset var(--on-primary) 0 0 min(25vw, 25vh);
 	}
 </style>

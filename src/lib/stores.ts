@@ -1,7 +1,7 @@
 import {
-	derived,
 	asyncDerived,
 	asyncWritable,
+	derived,
 	type Loadable,
 } from "@square/svelte-store";
 import { invoke } from "@tauri-apps/api";
@@ -12,12 +12,17 @@ type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = "off" | "track" | "context";
 
 export const pageWidth = writable(0);
+export const preventWidthUpdate = writable(false);
 export const displayedProgress = writable(0);
 
 export function optimisticProgress(frequency: number) {
 	const interval = setInterval(() => {
 		if (get(playing)) {
-			displayedProgress.update((p) => p + frequency);
+			if (get(displayedProgress) + frequency > get(duration)) {
+				state.reload && state.reload();
+			} else {
+				displayedProgress.update((p) => p + frequency);
+			}
 		}
 	}, frequency);
 	return () => clearInterval(interval);
@@ -27,6 +32,12 @@ export const authenticated = asyncWritable(
 	[],
 	async () => await invoke<boolean>("is_authenticated"),
 	async () => await invoke<boolean>("authenticate", { window: appWindow }),
+	{ reloadable: true }
+);
+
+export const devices = asyncDerived(
+	[],
+	async () => await invoke<SpotifyApi.UserDevice[]>("get_device_list"),
 	{ reloadable: true }
 );
 
@@ -42,7 +53,10 @@ export const state = asyncDerived(
 );
 
 export function autoPoll(frequency: number) {
-	const interval = setInterval(() => state && state.reload!(), frequency);
+	const interval = setInterval(
+		() => state.reload && state.reload!(),
+		frequency
+	);
 	return () => clearInterval(interval);
 }
 
@@ -60,6 +74,21 @@ export const images: Loadable<SpotifyApi.ImageObject[]> = derived(
 			return (<SpotifyApi.TrackObjectFull>get(currentItem)).album.images;
 		else return new Array(3).fill({ url: "./ambient.gif" });
 	}
+);
+export const title = derived(currentItem, ($i) => $i?.name ?? "");
+export const subheading = derived(trackId, () => {
+	if (get(currentType) == "episode")
+		return (<SpotifyApi.EpisodeObject>get(currentItem)).show.name ?? "";
+	else if (get(currentType) == "track")
+		return (<SpotifyApi.TrackObjectFull>get(currentItem)).artists
+			.map((a) => a.name)
+			.join(", ");
+	else return "";
+});
+export let songLink = derived([currentType, trackId], ([$type, $trackId]) =>
+	$type && $trackId
+		? `https://open.spotify.com/${$type}/${$trackId}`
+		: undefined
 );
 
 export const progress = asyncWritable(
