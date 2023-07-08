@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { invoke } from "@tauri-apps/api";
 	import { Menu, MenuItem } from ".";
-	import { devices, state } from "../../stores";
+	import { authenticated, devices, state } from "../../stores";
 	import { deviceTypeToIcon } from "../../utils";
 	import { Button } from "../button";
 	import { VolumeControl } from "../controls";
+	import { derived } from "svelte/store";
 </script>
 
 <Menu rightAlign>
-	<Button slot="button">
-		<svelte:component this={deviceTypeToIcon($state?.device?.type)} size="1rem" />
+	<Button slot="button" disable={derived(authenticated, (a) => !a)}>
+		<svelte:component
+			this={deviceTypeToIcon($state?.device?.type)}
+			size="1rem"
+		/>
 		<span slot="extend">{$state?.device?.name ?? "Not connected"}</span>
 	</Button>
 	<VolumeControl slot="header" />

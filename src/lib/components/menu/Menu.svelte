@@ -52,7 +52,6 @@
 		justify-content: center;
 	}
 	menu {
-		width: 10rem;
 		max-width: calc(100vw - 1.4rem);
 		max-height: calc(100vh - 3.2rem);
 		border-radius: 0.5rem;

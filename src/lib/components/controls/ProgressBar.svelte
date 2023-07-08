@@ -20,9 +20,10 @@
 
 	$: if (!scrubbing) thumbProgress = $displayedProgress;
 
-	$: thumbCenter =
-		(!$duration ? 0 : thumbProgress / $duration) * (sliderWidth - 6) + 3;
 	$: disabled = $disable || $duration == 0;
+	$: thumbCenter = disabled
+		? 0
+		: (!$duration ? 0 : thumbProgress / $duration) * (sliderWidth - 6) + 3;
 </script>
 
 <span
@@ -112,8 +113,13 @@
 		border-radius: 3px;
 		background: white;
 	}
+	.slider:disabled {
+		background: white;
+		opacity: 0.25;
+		--value:
+	}
 	.slider:disabled::-webkit-slider-thumb {
-		color: var(--outline);
+		display: none;
 	}
 	.slider:focus-visible::-webkit-slider-thumb {
 		outline: var(--active) solid 4px;

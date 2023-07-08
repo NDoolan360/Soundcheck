@@ -43,7 +43,7 @@
 </script>
 
 <Stack height="100vh" width="100vw" margin="0.35rem" padding="0.35rem">
-	<Row>
+	<Row height="1.5rem">
 		<MainMenu />
 		<DeviceMenu />
 	</Row>

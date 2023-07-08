@@ -10,14 +10,12 @@
 	export let color = "inherit";
 	export let background = "inherit";
 	export let center = false;
-	const adjustedHeight = `calc(${height} - 2 * ${margin})`;
-	const adjustedWidth = `calc(${width} - 2 * ${margin})`;
 </script>
 
 <svelte:element
 	this={type}
-	style:height={adjustedHeight}
-	style:width={adjustedWidth}
+	style:height="calc({height} - 2 * {margin})"
+	style:width="calc({width} - 2 * {margin})"
 	style:padding
 	style:margin
 	style:gap

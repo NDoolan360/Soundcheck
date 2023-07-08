@@ -48,7 +48,7 @@
 	<slot size={`calc(${size} - 0.5rem)`} />
 	{#if $$slots.extend && $active}
 		<span
-			class="extend"
+			class="extend text"
 			transition:slide|local={{ axis: "x", duration: 300 }}
 		>
 			<slot name="extend" />
@@ -103,7 +103,14 @@
 
 	.extend {
 		padding: 0 0.5rem;
-		justify-content: start;
+		max-width: 100%;
+	}
+	.text {
+		padding: 0 0 0 0.35rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+		text-align: left;
 	}
 	.square {
 		border-radius: 0;
