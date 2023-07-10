@@ -1,3 +1,4 @@
+import { hexFromArgb, type Scheme } from "@material/material-color-utilities";
 import {
 	Car,
 	Cast,
@@ -56,17 +57,14 @@ export const deviceTypeToIcon = (type: string | undefined) =>
 		} as { [id: string]: ComponentType }
 	)[(type ?? "undefined").toLowerCase().replaceAll(/[^a-z]/g, "")]);
 
-export const toCss = (data: IMaterialDynamicColorsThemeColor): string => {
+export const schemeToCss = (scheme: Scheme): string => {
+	const json = JSON.parse(JSON.stringify(scheme));
 	let style = [];
-	for (const value in data) {
+	for (const value in json) {
 		const kebabCase = value
 			.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2")
 			.toLowerCase();
-		style.push(
-			`--${kebabCase}: ${
-				data[value as keyof IMaterialDynamicColorsThemeColor]
-			};`
-		);
+		style.push(`--${kebabCase}: ${hexFromArgb(json[value])};`);
 	}
 	return style.join(" ");
 };

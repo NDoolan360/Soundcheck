@@ -13,6 +13,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+		"@material/material-color-utilities": "^0.2.7",
 		"@square/svelte-store": "^1.0.17",
 		"@sveltejs/adapter-static": "^2.0.2",
 		"@sveltejs/kit": "^1.22.1",
@@ -20,7 +21,6 @@
 		"@tauri-apps/cli": "^1.4.0",
 		"@types/spotify-api": "^0.0.22",
 		"lucide-svelte": "^0.259",
-		"material-dynamic-colors": "1.0.1",
 		"svelte": "^4.0.5",
 		"svelte-check": "^3.4.5",
 		"tslib": "^2.6.0",

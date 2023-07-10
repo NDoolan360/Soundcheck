@@ -13,9 +13,9 @@
 		subheading,
 		title,
 	} from "$lib/stores";
-	import { toCss } from "$lib/utils";
+	import { schemeToCss } from "$lib/utils";
+	import { themeFromImage } from "@material/material-color-utilities";
 	import { safeLoad } from "@square/svelte-store";
-	import "material-dynamic-colors";
 	import { onMount } from "svelte";
 	import { get } from "svelte/store";
 
@@ -33,13 +33,22 @@
 		};
 	});
 
-	$: materialDynamicColors($images[2].url).then((colors) => {
-		document.body.setAttribute(
-			"style",
-			`--background-image: url(${get(images)[0].url});` +
-				toCss(colors.dark)
-		);
-	});
+	const themeFromURL = async (source: string) => {
+		const blob = await fetch(source).then((response) => response.blob());
+		let image = new Image(64);
+		image.src = URL.createObjectURL(blob);
+
+		const theme = await themeFromImage(image);
+		return schemeToCss(theme.schemes.dark);
+	};
+
+	$: themeFromURL($images[2].url)
+		.then((theme) => {
+			document.body.setAttribute(
+				"style",
+				`--background-image: url(${get(images)[0].url});` + theme
+			);
+		});
 </script>
 
 <Stack height="100vh" width="100vw" margin="0.35rem" padding="0.35rem">
