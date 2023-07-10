@@ -23,6 +23,7 @@
 	style:background
 	style:justify-content={center ? "center" : "space-between"}
 	data-tauri-drag-region
+	role="none"
 	on:mousedown={unfocusActive}
 	{...$$restProps}
 >
