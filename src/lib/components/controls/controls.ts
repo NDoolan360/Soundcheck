@@ -1,14 +1,15 @@
 import {
 	currentType,
 	disallows,
+	displayedProgress,
 	duration,
 	liked,
 	pageWidth,
 	playing,
 	progress,
+	reloadState,
 	repeat,
 	shuffle,
-	state,
 	trackId,
 } from "$lib/stores";
 import { nextRepeat } from "$lib/utils";
@@ -17,9 +18,7 @@ import { invoke } from "@tauri-apps/api";
 import {
 	Heart,
 	Pause,
-	PauseCircle,
 	Play,
-	PlayCircle,
 	Repeat,
 	Repeat1,
 	RotateCcw,
@@ -79,10 +78,11 @@ const control_list = {
 	},
 	prev: {
 		component: DynamicIcon,
-		click: () =>
-			invoke("previous_track").finally(
-				() => state.reload && state.reload()
-			),
+		click: () => {
+			if (get(displayedProgress) < 3000)
+				invoke("previous_track").then(reloadState);
+			else progress.set(0);
+		},
 		props: {
 			icon: readable(SkipBack),
 			disable: derived(disallows, (d) => !d || d.skipping_prev),
@@ -105,8 +105,7 @@ const control_list = {
 	},
 	next: {
 		component: DynamicIcon,
-		click: () =>
-			invoke("next_track").finally(() => state.reload && state.reload()),
+		click: () => invoke("next_track").then(reloadState),
 		props: {
 			icon: readable(SkipForward),
 			disable: derived(disallows, (d) => !d || d.skipping_next),

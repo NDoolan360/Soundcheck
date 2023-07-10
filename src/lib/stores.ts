@@ -2,6 +2,7 @@ import {
 	asyncDerived,
 	asyncWritable,
 	derived,
+	reloadAll,
 	type Loadable,
 } from "@square/svelte-store";
 import { invoke } from "@tauri-apps/api";
@@ -52,11 +53,10 @@ export const state = asyncDerived(
 	{ reloadable: true }
 );
 
+export const reloadState = () => reloadAll(state);
+
 export function autoPoll(frequency: number) {
-	const interval = setInterval(
-		() => state.reload && state.reload!(),
-		frequency
-	);
+	const interval = setInterval(reloadState, frequency);
 	return () => clearInterval(interval);
 }
 
