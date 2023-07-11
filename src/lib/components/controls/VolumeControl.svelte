@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { state, volume } from "$lib/stores";
-	import { Volume, Volume1, Volume2, VolumeX } from "lucide-svelte";
+	import { Volume1, Volume2, VolumeX, XCircle } from "lucide-svelte";
 	import Row from "../container/Row.svelte";
 	import { getMenuOptions } from "../menu/context";
 
@@ -44,9 +44,9 @@
 	</span>
 	<span class="icon" class:disabled>
 		{#if disabled}
-			<VolumeX size={iconSize} />
+			<XCircle size={iconSize} />
 		{:else if thumbProgress == 0}
-			<Volume size={iconSize} />
+			<VolumeX size={iconSize} />
 		{:else if (thumbProgress ?? 0) < 50}
 			<Volume1 size={iconSize} />
 		{:else}
