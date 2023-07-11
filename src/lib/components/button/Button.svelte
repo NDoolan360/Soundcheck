@@ -45,11 +45,11 @@
 	disabled={$disable}
 	transition:fade
 >
-	<slot size={`calc(${size} - 0.5rem)`} />
+	<slot />
 	{#if $$slots.extend && $active}
 		<span
 			class="extend text"
-			transition:slide|local={{ axis: "x", duration: 300 }}
+			transition:slide={{ axis: "x", duration: 300 }}
 		>
 			<slot name="extend" />
 		</span>
@@ -59,10 +59,11 @@
 <style>
 	button {
 		padding: 0;
+		margin: auto;
 		outline: none;
 		border: none;
 		border-radius: 1.25rem;
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0;

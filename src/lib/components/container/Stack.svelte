@@ -1,39 +1,30 @@
 <script lang="ts">
 	import { unfocusActive } from "$lib/utils";
 
-	export let type = "div";
 	export let height = "100%";
 	export let width = "100%";
 	export let padding = "0";
 	export let margin = "0";
-	export let gap = "0";
-	export let color = "inherit";
-	export let background = "inherit";
-	export let center = false;
 </script>
 
-<svelte:element
-	this={type}
+<div
 	style:height="calc({height} - 2 * {margin})"
 	style:width="calc({width} - 2 * {margin})"
 	style:padding
 	style:margin
-	style:gap
-	style:color
-	style:background
-	style:justify-content={center ? "center" : "space-between"}
 	data-tauri-drag-region
 	role="none"
 	on:mousedown={unfocusActive}
 	{...$$restProps}
 >
 	<slot />
-</svelte:element>
+</div>
 
 <style>
 	* {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: space-between;
 	}
 </style>

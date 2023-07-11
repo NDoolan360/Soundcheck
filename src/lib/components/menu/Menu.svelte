@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { writable } from "svelte/store";
-	import { slide } from "svelte/transition";
 	import { setButtonOptions } from "../button/context";
 	import { getMenuOptions, setMenuOptions } from "./context";
 
@@ -28,7 +27,7 @@
 <div id={`button-menu-${uid}`} on:focusout={leave}>
 	<slot name="button" />
 	{#if $open}
-		<menu transition:slide class:right-align={rightAlign}>
+		<menu class:right-align={rightAlign}>
 			{#if $$slots.header}
 				<span
 					style:color
@@ -63,6 +62,7 @@
 		list-style: none;
 
 		box-shadow: var(--elevate);
+		translate: 0 3px;
 	}
 	menu.right-align {
 		right: 0;
