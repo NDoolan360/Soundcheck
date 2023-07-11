@@ -1,4 +1,8 @@
-import { hexFromArgb, type Scheme } from "@material/material-color-utilities";
+import {
+	hexFromArgb,
+	themeFromImage,
+	type Scheme,
+} from "@material/material-color-utilities";
 import {
 	Car,
 	Cast,
@@ -57,7 +61,7 @@ export const deviceTypeToIcon = (type: string | undefined) =>
 		} as { [id: string]: ComponentType }
 	)[(type ?? "undefined").toLowerCase().replaceAll(/[^a-z]/g, "")]);
 
-export const schemeToCss = (scheme: Scheme): string => {
+const schemeToCss = (scheme: Scheme): string => {
 	const json = JSON.parse(JSON.stringify(scheme));
 	let style = [];
 	for (const value in json) {
@@ -67,6 +71,23 @@ export const schemeToCss = (scheme: Scheme): string => {
 		style.push(`--${kebabCase}: ${hexFromArgb(json[value])};`);
 	}
 	return style.join(" ");
+};
+
+export const setThemeFromImage = async (images: SpotifyApi.ImageObject[]) => {
+	const blob = await fetch(images.at(-1)!.url).then((response) =>
+		response.blob()
+	);
+	let img = new Image(images.at(-1)!.width, images.at(-1)!.height);
+	img.src = URL.createObjectURL(blob);
+	const theme = await themeFromImage(img);
+	URL.revokeObjectURL(img.src);
+
+	const css = schemeToCss(theme.schemes.dark);
+	document.body.setAttribute(
+		"style",
+		`--background-image: url(${images[0].url});` + css
+	);
+	console.log("set theme");
 };
 
 export const unfocusActive = (e: MouseEvent) =>

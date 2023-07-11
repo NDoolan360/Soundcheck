@@ -6,18 +6,19 @@
 	import {
 		authenticated,
 		autoPoll,
-		images,
 		optimisticProgress,
 		pageWidth,
 		preventWidthUpdate,
 		subheading,
-		title,
+		title
 	} from "$lib/stores";
-	import { schemeToCss } from "$lib/utils";
-	import { themeFromImage } from "@material/material-color-utilities";
 	import { safeLoad } from "@square/svelte-store";
 	import { onMount } from "svelte";
-	import { get } from "svelte/store";
+
+	document.body.setAttribute(
+		"style",
+		"--background-image: url(./ambient.gif);--primary: #00dce5; --on-primary: #003739; --primary-container: #004f53; --on-primary-container: #62f7ff; --secondary: #b1cccd; --on-secondary: #1b3436; --secondary-container: #324b4c; --on-secondary-container: #cce8e9; --tertiary: #b6c7e9; --on-tertiary: #1f314c; --tertiary-container: #364764; --on-tertiary-container: #d6e3ff; --error: #ffb4ab; --on-error: #690005; --error-container: #93000a; --on-error-container: #ffb4ab; --background: #191c1c; --on-background: #e0e3e3; --surface: #191c1c; --on-surface: #e0e3e3; --surface-variant: #3f4949; --on-surface-variant: #bec8c9; --outline: #899393; --outline-variant: #3f4949; --shadow: #000000; --scrim: #000000; --inverse-surface: #e0e3e3; --inverse-on-surface: #2d3131; --inverse-primary: #00696e;"
+	);
 
 	onMount(() => {
 		const widthInterval = setInterval(
@@ -32,27 +33,10 @@
 			stopOptimiticUpdate();
 		};
 	});
-
-	const themeFromURL = async (source: string) => {
-		const blob = await fetch(source).then((response) => response.blob());
-		let image = new Image(64);
-		image.src = URL.createObjectURL(blob);
-
-		const theme = await themeFromImage(image);
-		return schemeToCss(theme.schemes.dark);
-	};
-
-	$: themeFromURL($images[2].url)
-		.then((theme) => {
-			document.body.setAttribute(
-				"style",
-				`--background-image: url(${get(images)[0].url});` + theme
-			);
-		});
 </script>
 
 <Stack height="100vh" width="100vw" margin="0.35rem" padding="0.35rem">
-	<Row height="1.5rem">
+	<Row>
 		<MainMenu />
 		<DeviceMenu />
 	</Row>
@@ -111,7 +95,7 @@
 		background-image: var(--background-image, url("./ambient.gif"));
 		background-size: cover;
 		background-position: center;
-		opacity: 0.8;
+		opacity: 0.75;
 		box-shadow: inset var(--on-primary) 0 0 min(25vw, 25vh);
 	}
 </style>

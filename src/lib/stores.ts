@@ -4,10 +4,13 @@ import {
 	derived,
 	reloadAll,
 	type Loadable,
+	isReloadable,
+	safeLoad,
 } from "@square/svelte-store";
 import { invoke } from "@tauri-apps/api";
 import { appWindow } from "@tauri-apps/api/window";
 import { get, writable } from "svelte/store";
+import { setThemeFromImage } from "./utils";
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = "off" | "track" | "context";
@@ -20,7 +23,7 @@ export function optimisticProgress(frequency: number) {
 	const interval = setInterval(() => {
 		if (get(playing)) {
 			if (get(displayedProgress) + frequency > get(duration)) {
-				state.reload && state.reload();
+				reloadState();
 			} else {
 				displayedProgress.update((p) => p + frequency);
 			}
@@ -53,7 +56,7 @@ export const state = asyncDerived(
 	{ reloadable: true }
 );
 
-export const reloadState = () => reloadAll(state);
+export const reloadState = () => isReloadable(state) && state.reload();
 
 export function autoPoll(frequency: number) {
 	const interval = setInterval(reloadState, frequency);
@@ -72,9 +75,11 @@ export const images: Loadable<SpotifyApi.ImageObject[]> = derived(
 			return (<SpotifyApi.EpisodeObject>get(currentItem)).images;
 		else if (get(currentType) == "track")
 			return (<SpotifyApi.TrackObjectFull>get(currentItem)).album.images;
-		else return new Array(3).fill({ url: "./ambient.gif" });
+		else return [{ url: "./ambient.gif", width: 361, height: 480 }];
 	}
 );
+images.subscribe(setThemeFromImage);
+
 export const title = derived(currentItem, ($i) => $i?.name ?? "");
 export const subheading = derived(trackId, () => {
 	if (get(currentType) == "episode")
