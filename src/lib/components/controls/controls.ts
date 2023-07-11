@@ -29,7 +29,7 @@ import {
 } from "lucide-svelte";
 import type { ComponentType } from "svelte";
 import { get, readable, type Readable } from "svelte/store";
-import DynamicIcon from "./DynamicIcon.svelte";
+import { DynamicIcon } from "../icon";
 import ProgressBar from "./ProgressBar.svelte";
 
 type Control = {
@@ -80,7 +80,9 @@ const control_list = {
 		component: DynamicIcon,
 		click: () => {
 			if (get(displayedProgress) < 3000)
-				invoke("previous_track").then(reloadState);
+				invoke("previous_track").then(() =>
+					setTimeout(reloadState, 1000)
+				);
 			else progress.set(0);
 		},
 		props: {
@@ -105,7 +107,8 @@ const control_list = {
 	},
 	next: {
 		component: DynamicIcon,
-		click: () => invoke("next_track").then(reloadState),
+		click: () =>
+			invoke("next_track").then(() => setTimeout(reloadState, 1000)),
 		props: {
 			icon: readable(SkipForward),
 			disable: derived(disallows, (d) => !d || d.skipping_next),

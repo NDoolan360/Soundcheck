@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Loader2, LogInIcon } from "lucide-svelte";
+	import { LogInIcon } from "lucide-svelte";
 	import { Button } from ".";
 	import { authenticated } from "../../stores";
+	import { Spinner } from "../icon";
 
 	let loading: boolean = false;
 	const authenticate = async () => {
@@ -13,16 +14,7 @@
 
 <Button on:click={authenticate}>
 	{#if loading}
-		<Loader2>
-			<animateTransform
-				attributeName="transform"
-				type="rotate"
-				dur="1s"
-				from="0"
-				to="360"
-				repeatCount="indefinite"
-			/>
-		</Loader2>
+		<Spinner />
 	{:else}
 		<LogInIcon />
 	{/if}
