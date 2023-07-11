@@ -10,7 +10,7 @@
 		pageWidth,
 		preventWidthUpdate,
 		subheading,
-		title
+		title,
 	} from "$lib/stores";
 	import { safeLoad } from "@square/svelte-store";
 	import { onMount } from "svelte";
@@ -47,7 +47,7 @@
 			{:else}
 				<hgroup style:color="white">
 					<h3>{$title}</h3>
-					<p>{$subheading}</p>
+					<p style:color="lightgrey">{$subheading}</p>
 				</hgroup>
 				<PlayPauseFab />
 			{/if}
@@ -95,7 +95,7 @@
 		background-image: var(--background-image, url("./ambient.gif"));
 		background-size: cover;
 		background-position: center;
-		opacity: 0.75;
-		box-shadow: inset var(--on-primary) 0 0 min(25vw, 25vh);
+		opacity: 0.7;
+		box-shadow: inset var(--on-primary) 0 0 min(30vw, 30vh);
 	}
 </style>
