@@ -49,6 +49,7 @@
 		z-index: 101;
 		align-items: center;
 		justify-content: center;
+		max-width: calc(100vw - 3rem);
 	}
 	menu {
 		max-width: calc(100vw - 1.4rem);
