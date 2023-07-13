@@ -2,15 +2,14 @@ import {
 	asyncDerived,
 	asyncWritable,
 	derived,
-	reloadAll,
-	type Loadable,
 	isReloadable,
-	safeLoad,
+	type Loadable,
 } from "@square/svelte-store";
 import { invoke } from "@tauri-apps/api";
 import { appWindow } from "@tauri-apps/api/window";
 import { get, writable } from "svelte/store";
 import { setThemeFromImage } from "./utils";
+import ambient from "$lib/assets/ambient.gif";
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = "off" | "track" | "context";
@@ -75,7 +74,7 @@ export const images: Loadable<SpotifyApi.ImageObject[]> = derived(
 			return (<SpotifyApi.EpisodeObject>get(currentItem)).images;
 		else if (get(currentType) == "track")
 			return (<SpotifyApi.TrackObjectFull>get(currentItem)).album.images;
-		else return [{ url: "./ambient.gif", width: 361, height: 480 }];
+		else return [{ url: ambient, width: 361, height: 480 }];
 	}
 );
 images.subscribe(setThemeFromImage);

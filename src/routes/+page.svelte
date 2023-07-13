@@ -14,10 +14,11 @@
 	} from "$lib/stores";
 	import { safeLoad } from "@square/svelte-store";
 	import { onMount } from "svelte";
+	import ambient from "$lib/assets/ambient.gif";
 
 	document.body.setAttribute(
 		"style",
-		"--background-image: url(./ambient.gif);--primary: #00dce5; --on-primary: #003739; --primary-container: #004f53; --on-primary-container: #62f7ff; --secondary: #b1cccd; --on-secondary: #1b3436; --secondary-container: #324b4c; --on-secondary-container: #cce8e9; --tertiary: #b6c7e9; --on-tertiary: #1f314c; --tertiary-container: #364764; --on-tertiary-container: #d6e3ff; --error: #ffb4ab; --on-error: #690005; --error-container: #93000a; --on-error-container: #ffb4ab; --background: #191c1c; --on-background: #e0e3e3; --surface: #191c1c; --on-surface: #e0e3e3; --surface-variant: #3f4949; --on-surface-variant: #bec8c9; --outline: #899393; --outline-variant: #3f4949; --shadow: #000000; --scrim: #000000; --inverse-surface: #e0e3e3; --inverse-on-surface: #2d3131; --inverse-primary: #00696e;"
+		`--background-image: url(${ambient});--primary: #00dce5; --on-primary: #003739; --primary-container: #004f53; --on-primary-container: #62f7ff; --secondary: #b1cccd; --on-secondary: #1b3436; --secondary-container: #324b4c; --on-secondary-container: #cce8e9; --tertiary: #b6c7e9; --on-tertiary: #1f314c; --tertiary-container: #364764; --on-tertiary-container: #d6e3ff; --error: #ffb4ab; --on-error: #690005; --error-container: #93000a; --on-error-container: #ffb4ab; --background: #191c1c; --on-background: #e0e3e3; --surface: #191c1c; --on-surface: #e0e3e3; --surface-variant: #3f4949; --on-surface-variant: #bec8c9; --outline: #899393; --outline-variant: #3f4949; --shadow: #000000; --scrim: #000000; --inverse-surface: #e0e3e3; --inverse-on-surface: #2d3131; --inverse-primary: #00696e;`
 	);
 
 	onMount(() => {
@@ -92,7 +93,7 @@
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-image: var(--background-image, url("./ambient.gif"));
+		background-image: var(--background-image);
 		background-size: cover;
 		background-position: center;
 		opacity: 0.7;
