@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { unfocusActive } from "$lib/utils";
 
-	export let height = "100%";
-	export let width = "100%";
-	export let padding = "0";
-	export let margin = "0";
+	export let height = "100vh";
+	export let width = "100vw";
+	export let padding = "0.35rem";
+	export let margin = "0.35rem";
 </script>
 
 <div

@@ -8,7 +8,7 @@
 	const authenticate = async () => {
 		loading = true;
 		await authenticated.set(false);
-		loading = false;
+		setTimeout(() => (loading = false), 500);
 	};
 </script>
 

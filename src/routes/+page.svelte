@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LogIn } from "$lib/components/button";
-	import { Row, Stack } from "$lib/components/container";
+	import { Row, AppContainer } from "$lib/components/container";
 	import { ControlBar, PlayPauseFab } from "$lib/components/controls";
 	import { DeviceMenu, MainMenu } from "$lib/components/menu";
 	import {
@@ -36,15 +36,17 @@
 	});
 </script>
 
-<Stack height="100vh" width="100vw" margin="0.35rem" padding="0.35rem">
+<AppContainer>
 	<Row>
 		<MainMenu />
 		<DeviceMenu />
 	</Row>
-	<Row center={!$authenticated}>
+	<Row>
 		{#await safeLoad(authenticated) then}
 			{#if !$authenticated}
-				<LogIn />
+				<span class="center">
+					<LogIn />
+				</span>
 			{:else}
 				<hgroup style:color="white">
 					<h3>{$title}</h3>
@@ -55,7 +57,7 @@
 		{/await}
 	</Row>
 	<ControlBar />
-</Stack>
+</AppContainer>
 
 <style>
 	hgroup {
@@ -65,6 +67,18 @@
 		user-select: none;
 		mask-image: linear-gradient(90deg, #000 90%, transparent);
 		-webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
+	}
+
+	.center {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		user-select: none;
 	}
 
 	:global(:root) {
