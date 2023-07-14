@@ -52,6 +52,7 @@
 		max-width: calc(100vw - 3rem);
 	}
 	menu {
+		min-width: calc(10rem - 1.4rem);
 		max-width: calc(100vw - 1.4rem);
 		max-height: calc(100vh - 3.2rem);
 		border-radius: 0.5rem;
@@ -64,6 +65,8 @@
 
 		box-shadow: var(--elevate);
 		translate: 0 3px;
+
+		transition: width linear;
 	}
 	menu.right-align {
 		right: 0;

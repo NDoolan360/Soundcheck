@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invoke } from "@tauri-apps/api";
-	import { Loader2, MonitorOff } from "lucide-svelte";
+	import { MonitorOff } from "lucide-svelte";
 	import { derived } from "svelte/store";
 	import { Menu, MenuItem } from ".";
 	import { authenticated, devices, state } from "../../stores";
@@ -19,17 +19,17 @@
 			size="1rem"
 			style="min-width: 1rem; min-height: 1rem;"
 		/>
-		<span slot="extend">{$state?.device?.name ?? "Not connected"}</span>
+		<span slot="extend">{$state?.device?.name ?? "No connection"}</span>
 	</Button>
 	<VolumeControl slot="header" />
 	<!-- Guarantee spinner runs for at least 1 second -->
 	{#await isReloadable(devices) && Promise.all( [devices.reload(), new Promise( (resolve) => setTimeout(resolve, 750) )] )}
 		<li class="menu-item" role="menuitem" transition:slide|global>
 			<Spinner size="1rem" />
-			<p>Loading...</p>
+			<p>Loading Devices...</p>
 		</li>
 	{:then}
-		{#if $devices.length > 0}
+		{#if $devices.filter((d) => !d.is_active).length > 0}
 			{#each $devices.filter((d) => !d.is_active) as device}
 				<MenuItem
 					on:click={() =>
@@ -45,7 +45,11 @@
 		{:else}
 			<li class="menu-item" role="menuitem" in:slide|global>
 				<MonitorOff size="1rem" />
-				<p>No Devices</p>
+				{#if $devices.length > 0}
+					<p>No more Devices</p>
+				{:else}
+					<p>No Devices</p>
+				{/if}
 			</li>
 		{/if}
 	{/await}
@@ -59,6 +63,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		padding: 0 0.5rem;
 		gap: 0.35rem;
 		user-select: none;
 		font-size: 75%;
