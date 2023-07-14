@@ -12,7 +12,7 @@ use crate::playback::{
     set_liked, set_playing, set_repeat, set_shuffle, set_volume,
 };
 
-use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
+use rspotify::{scopes, AuthCodePkceSpotify, Credentials, OAuth};
 use std::sync::Mutex;
 use tauri::{generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
@@ -24,19 +24,16 @@ fn main() {
     let oauth = OAuth {
         redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
         scopes: scopes!(
-            "user-read-playback-state user-modify-playback-state user-library-read user-library-modify"
+            "user-read-playback-state 
+            user-modify-playback-state 
+            user-library-read 
+            user-library-modify"
         ),
-        ..Default::default()
-    };
-    let config = Config {
-        token_cached: true,
         ..Default::default()
     };
 
     Builder::default()
-        .manage(Spotify(Mutex::new(AuthCodePkceSpotify::with_config(
-            creds, oauth, config,
-        ))))
+        .manage(Spotify(Mutex::new(AuthCodePkceSpotify::new(creds, oauth))))
         .invoke_handler(generate_handler![
             authenticate,
             is_authenticated,

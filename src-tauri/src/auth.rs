@@ -1,5 +1,4 @@
-use chrono::{Duration, Utc};
-use rspotify::{prelude::*, AuthCodePkceSpotify, ClientError::CacheFile, ClientResult, Token};
+use rspotify::{prelude::*, AuthCodePkceSpotify};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use tauri::{command, Manager, State, Window, WindowEvent, WindowUrl};
@@ -13,9 +12,7 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<b
     }
     if let Some(auth_window) = window.get_window("auth") {
         auth_window.set_focus().unwrap();
-        return Err(format!(
-            "Auth window is already open, try again"
-        ));
+        return Err(format!("Auth window is already open, try again"));
     }
     let mut spotify = state.0.lock().unwrap().clone();
     match start_server(&window, &mut spotify) {
@@ -33,9 +30,10 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<b
 #[command]
 pub async fn is_authenticated(state: State<'_, Spotify>) -> Result<bool, ()> {
     let spotify = state.0.lock().unwrap().clone();
-    match get_cached_token(&spotify).await {
-        Ok(_) => Ok(true),
-        Err(_) => Err(()),
+    let token = spotify.get_token().lock().await.unwrap().clone();
+    match token {
+        Some(_token) => Ok(true),
+        None => Err(()),
     }
 }
 
@@ -150,32 +148,4 @@ fn respond_with_error(e: String, mut stream: TcpStream) {
     let response = format!("HTTP/1.1 400 Bad Request\r\n\r\n400 - Bad Request - {}", e);
     stream.write_all(response.as_bytes()).unwrap();
     stream.flush().unwrap();
-}
-
-pub async fn get_cached_token(spotify: &AuthCodePkceSpotify) -> ClientResult<Token> {
-    // if expired refetch and cache
-    let token_expired = spotify
-        .get_token()
-        .lock()
-        .await
-        .unwrap()
-        .as_ref()
-        .map_or(true, |token| {
-            token.expires_at.map_or(true, |expiration| {
-                Utc::now() + Duration::minutes(30) >= expiration
-            })
-        });
-    if token_expired {
-        *spotify.get_token().lock().await.unwrap() = spotify.refetch_token().await?;
-        spotify.write_token_cache().await?;
-    }
-
-    // return token from cache
-    match spotify.read_token_cache(false).await? {
-        Some(cached_token) => {
-            *spotify.get_token().lock().await.unwrap() = Some(cached_token.clone());
-            Ok(cached_token)
-        }
-        None => Err(CacheFile(format!("No token found in cache"))),
-    }
 }
