@@ -1,5 +1,5 @@
-import { getContext, setContext } from "svelte";
-import type { Writable } from "svelte/store";
+import { getContext, setContext } from 'svelte';
+import type { Writable } from 'svelte/store';
 
 export type MenuContextOptions = {
 	open?: Writable<boolean>;
@@ -8,7 +8,7 @@ export type MenuContextOptions = {
 
 export const setMenuOptions = (
 	open: Writable<boolean> | undefined,
-	size: string | undefined
-) => setContext<MenuContextOptions>("menuCtx", { open, size });
+	size: string | undefined,
+) => setContext<MenuContextOptions>('menuCtx', { open, size });
 
-export const getMenuOptions = () => getContext<MenuContextOptions>("menuCtx");
+export const getMenuOptions = () => getContext<MenuContextOptions>('menuCtx');

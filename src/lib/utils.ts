@@ -2,7 +2,7 @@ import {
 	hexFromArgb,
 	themeFromImage,
 	type Scheme,
-} from "@material/material-color-utilities";
+} from '@material/material-color-utilities';
 import {
 	Car,
 	Cast,
@@ -19,8 +19,8 @@ import {
 	Unplug,
 	Usb,
 	Watch,
-} from "lucide-svelte";
-import type { ComponentType } from "svelte";
+} from 'lucide-svelte';
+import type { ComponentType } from 'svelte';
 
 // Util for converting raw times to pretty times
 export const prettyTime = (rawTime: number) => {
@@ -32,12 +32,12 @@ export const prettyTime = (rawTime: number) => {
 
 // Util for transitioning repeat state
 export const nextRepeat = (state: string) =>
-	state === "off" ? "context" : state === "context" ? "track" : "off";
+	state === 'off' ? 'context' : state === 'context' ? 'track' : 'off';
 
 // Get a devices Icon
 export const deviceTypeToIcon = (type: string | undefined) =>
-	((
-		{
+	(
+		({
 			unknown: HelpCircle,
 			computer: Monitor,
 			tablet: Tablet,
@@ -58,24 +58,24 @@ export const deviceTypeToIcon = (type: string | undefined) =>
 			observer: MonitorSmartphone,
 			homething: MonitorSmartphone,
 			undefined: Unplug,
-		} as { [id: string]: ComponentType }
-	)[(type ?? "undefined").toLowerCase().replaceAll(/[^a-z]/g, "")]);
+		}) as { [id: string]: ComponentType }
+	)[(type ?? 'undefined').toLowerCase().replaceAll(/[^a-z]/g, '')];
 
 const schemeToCss = (scheme: Scheme): string => {
 	const json = JSON.parse(JSON.stringify(scheme));
 	let style = [];
 	for (const value in json) {
 		const kebabCase = value
-			.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2")
+			.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2')
 			.toLowerCase();
 		style.push(`--${kebabCase}: ${hexFromArgb(json[value])};`);
 	}
-	return style.join(" ");
+	return style.join(' ');
 };
 
 export const setThemeFromImage = async (images: SpotifyApi.ImageObject[]) => {
-	const blob = await fetch(images.at(-1)!.url).then((response) =>
-		response.blob()
+	const blob = await fetch(images.at(-1)!.url).then(response =>
+		response.blob(),
 	);
 	let img = new Image(images.at(-1)!.width, images.at(-1)!.height);
 	img.src = URL.createObjectURL(blob);
@@ -84,13 +84,13 @@ export const setThemeFromImage = async (images: SpotifyApi.ImageObject[]) => {
 
 	const css = schemeToCss(theme.schemes.dark);
 	document.body.setAttribute(
-		"style",
-		`--background-image: url(${images[0].url});` + css
+		'style',
+		`--background-image: url(${images[0].url});` + css,
 	);
-	console.log("set theme");
+	console.log('set theme');
 };
 
 export const unfocusActive = (e: MouseEvent) =>
-	(e.target as Element).hasAttribute("data-tauri-drag-region") &&
+	(e.target as Element).hasAttribute('data-tauri-drag-region') &&
 	e.buttons === 1 &&
 	(document.activeElement as HTMLElement).blur();
