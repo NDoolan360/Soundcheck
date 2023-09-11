@@ -2,126 +2,112 @@ import {
 	asyncDerived,
 	asyncWritable,
 	derived,
-	isReloadable,
-	type Loadable,
+	get,
 } from '@square/svelte-store';
-import { invoke } from '@tauri-apps/api';
-import { appWindow } from '@tauri-apps/api/window';
-import { get, writable } from 'svelte/store';
-import { setThemeFromImage } from './utils';
-import ambient from '$lib/assets/ambient.gif';
+import { invoke, window } from '@tauri-apps/api';
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
-export type RepeatState = 'off' | 'track' | 'context';
-
-export const pageWidth = writable(0);
-export const preventWidthUpdate = writable(false);
-export const displayedProgress = writable(0);
-
-export function optimisticProgress(frequency: number) {
-	const interval = setInterval(() => {
-		if (get(playing)) {
-			if (get(displayedProgress) + frequency > get(duration)) {
-				reloadState();
-			} else {
-				displayedProgress.update(p => p + frequency);
-			}
-		}
-	}, frequency);
-	return () => clearInterval(interval);
-}
+export type RepeatState = 'track' | 'context' | 'off';
 
 export const authenticated = asyncWritable(
 	[],
 	async () => await invoke<boolean>('is_authenticated'),
-	async () => await invoke<boolean>('authenticate', { window: appWindow }),
-	{ reloadable: true },
-);
-
-export const devices = asyncDerived(
-	[],
-	async () => await invoke<SpotifyApi.UserDevice[]>('get_device_list'),
-	{ reloadable: true },
+	async newAuth =>
+		await invoke<boolean>(newAuth ? 'authenticate' : 'deauthenticate', {
+			window,
+		}),
+	{ reloadable: true, initial: false },
 );
 
 export const state = asyncDerived(
 	authenticated,
+	async $auth => ($auth ? await invoke<State>('get_playback_state') : null),
+	{ reloadable: true, initial: null },
+);
+
+export const devices = asyncDerived(
+	authenticated,
 	async $auth => {
-		if (!$auth) return null;
-		const state = await invoke<State>('get_playback_state');
-		displayedProgress.set(state?.progress_ms ?? 0);
-		return state;
+		const devices = !$auth
+			? []
+			: await invoke<SpotifyApi.UserDevice[]>('get_device_list');
+		if (!get(activeDevice) && devices.length === 1)
+			// TODO make it so the state doesn't go bad and then back again.
+			activeDevice.set(devices[0].id ?? undefined);
+		return devices;
 	},
+	{ reloadable: true, initial: [] },
+);
+export const activeDevice = asyncWritable(
+	state,
+	async $state => $state?.device?.id ?? undefined,
+	async newDeviceId => invoke('set_device', { deviceId: newDeviceId }),
 	{ reloadable: true },
 );
 
-export const reloadState = () => isReloadable(state) && state.reload();
-
-export function autoPoll(frequency: number) {
-	const interval = setInterval(reloadState, frequency);
-	return () => clearInterval(interval);
-}
-
-export const disallows = derived(state, $s => $s?.actions.disallows);
-export const currentType = derived(state, $s => $s?.currently_playing_type);
-export const currentItem = derived(state, $s => $s?.item);
+const currentItem = derived(state, $s => $s?.item);
 export const duration = derived(currentItem, $i => $i?.duration_ms ?? 0);
 export const trackId = derived(currentItem, $i => $i?.id);
-export const images: Loadable<SpotifyApi.ImageObject[]> = derived(
-	trackId,
-	() => {
-		if (get(currentType) == 'episode')
-			return (<SpotifyApi.EpisodeObject>get(currentItem)).images;
-		else if (get(currentType) == 'track')
-			return (<SpotifyApi.TrackObjectFull>get(currentItem)).album.images;
-		else return [{ url: ambient, width: 361, height: 480 }];
+export const currentType = derived(state, $s => $s?.currently_playing_type);
+export const images = derived(
+	[currentItem, currentType, trackId],
+	([$currentItem, $currentType, _]) => {
+		if ($currentType == 'episode')
+			return ($currentItem as SpotifyApi.EpisodeObject).images;
+		else if ($currentType == 'track')
+			return ($currentItem as SpotifyApi.TrackObjectFull).album.images;
+		else return [{ url: './ambient.gif', width: 361, height: 361 }];
 	},
 );
-images.subscribe(setThemeFromImage);
 
 export const title = derived(currentItem, $i => $i?.name ?? '');
-export const subheading = derived(trackId, () => {
-	if (get(currentType) == 'episode')
-		return (<SpotifyApi.EpisodeObject>get(currentItem)).show.name ?? '';
-	else if (get(currentType) == 'track')
-		return (<SpotifyApi.TrackObjectFull>get(currentItem)).artists
-			.map(a => a.name)
-			.join(', ');
-	else return '';
-});
+export const subheading = derived(
+	[currentItem, currentType, trackId],
+	([$currentItem, $currentType, _]) => {
+		if ($currentType == 'episode')
+			return ($currentItem as SpotifyApi.EpisodeObject)?.show?.name ?? '';
+		else if ($currentType == 'track')
+			return ($currentItem as SpotifyApi.TrackObjectFull)?.artists
+				.map(a => a.name)
+				.join(', ');
+		else return '';
+	},
+);
+
 export let songLink = derived([currentType, trackId], ([$type, $trackId]) =>
 	$type && $trackId
 		? `https://open.spotify.com/${$type}/${$trackId}`
 		: undefined,
 );
+export let deepLink = derived([currentType, trackId], ([$type, $trackId]) =>
+	$type && $trackId ? `spotify://${$type}/${$trackId}` : undefined,
+);
 
 export const progress = asyncWritable(
 	state,
 	async $state => $state?.progress_ms ?? 0,
-	async progress => {
-		displayedProgress.set(progress);
-		invoke<void>('seek', { progress });
-	},
+	async newProgress => invoke<void>('seek', { progress: newProgress }),
 );
-
 export const playing = asyncWritable(
 	state,
 	async $state => $state?.is_playing ?? false,
-	async playState => invoke<void>('set_playing', { playState }),
+	async newPlayState =>
+		invoke<void>('set_playing', { playState: newPlayState }),
 );
-
 export const shuffle = asyncWritable(
 	state,
 	async $state => $state?.shuffle_state ?? false,
-	async shuffleState => invoke<void>('set_shuffle', { shuffleState }),
+	async newShuffleState =>
+		invoke<void>('set_shuffle', { shuffleState: newShuffleState }),
+	{ initial: false },
 );
-
 export const repeat = asyncWritable(
 	state,
-	async $state => ($state?.repeat_state as RepeatState) ?? false,
-	async repeatState => invoke<void>('set_repeat', { repeatState }),
+	async $state => ($state?.repeat_state ?? 'off') as RepeatState,
+	async newRepeatState =>
+		invoke<void>('set_repeat', { repeatState: newRepeatState }),
+	{ initial: 'off' },
 );
-
 export const liked = asyncWritable(
 	trackId,
 	async $trackId =>
@@ -132,10 +118,38 @@ export const liked = asyncWritable(
 		if ($trackId)
 			return invoke<void>('set_liked', { trackId: $trackId, likedState });
 	},
+	{ initial: false },
 );
-
 export const volume = asyncWritable(
 	state,
 	async $state => $state?.device?.volume_percent ?? 0,
-	async volumePercent => invoke<void>('set_volume', { volumePercent }),
+	async newVolumePercent =>
+		invoke<void>('set_volume', { volumePercent: newVolumePercent }),
 );
+
+export const disallows = derived(state, $state => {
+	const disallowArray = ($state?.actions?.disallows as string[]) ?? {
+		includes: (action: string) => action != 'transferring_playback',
+	};
+	return {
+		playPause: $state?.is_playing
+			? disallowArray.includes('pausing')
+			: disallowArray.includes('resuming'),
+		seeking: disallowArray.includes('seeking'),
+		skippingNext: disallowArray.includes('skipping_next'),
+		skippingPrev: disallowArray.includes('skipping_prev'),
+		changeVolume: $state?.device?.id === undefined,
+		link: $state?.item?.id === undefined,
+		togglingLike: $state?.item?.id === undefined,
+		togglingRepeat:
+			(disallowArray.includes('toggling_repeat_context') &&
+				disallowArray.includes('toggling_repeat_track')) ||
+			($state?.repeat_state === 'context' &&
+				disallowArray.includes('toggling_repeat_context')) ||
+			($state?.repeat_state === 'track' &&
+				disallowArray.includes('toggling_repeat_track')),
+		togglingShuffle: disallowArray.includes('toggling_shuffle'),
+		transferringPlayback: disallowArray.includes('transferring_playback'),
+		interruptingPlayback: disallowArray.includes('interrupting_playback'),
+	};
+});

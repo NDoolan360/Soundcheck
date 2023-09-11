@@ -1,4 +1,4 @@
-# Spotlite
+# Soundcheck
 
 A desktop spotify mini player.
 
@@ -28,3 +28,7 @@ RSPOTIFY_REDIRECT_URI=http://localhost:<port number>
 It will detect your operating system and build a bundle accordingly. The result will be located in `src-tauri/target/release`.
 
 For more information about building applications for different platforms check out [the official documentation](https://tauri.app/v1/guides/building/)
+
+## Recommended IDE Setup
+
+[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).

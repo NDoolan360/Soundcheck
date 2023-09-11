@@ -4,7 +4,7 @@
 )]
 
 mod auth;
-use crate::auth::{authenticate, is_authenticated};
+use crate::auth::{authenticate, deauthenticate, is_authenticated};
 
 mod playback;
 use crate::playback::{
@@ -12,7 +12,7 @@ use crate::playback::{
     set_liked, set_playing, set_repeat, set_shuffle, set_volume,
 };
 
-use rspotify::{scopes, AuthCodePkceSpotify, Credentials, OAuth};
+use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
 use std::sync::Mutex;
 use tauri::{generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
@@ -20,22 +20,21 @@ use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
 pub struct Spotify(Mutex<AuthCodePkceSpotify>);
 
 fn main() {
-    let creds = Credentials::new_pkce(env!("RSPOTIFY_CLIENT_ID"));
-    let oauth = OAuth {
-        redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
-        scopes: scopes!(
-            "user-read-playback-state 
-            user-modify-playback-state 
-            user-library-read 
-            user-library-modify"
-        ),
-        ..Default::default()
-    };
-
     Builder::default()
-        .manage(Spotify(Mutex::new(AuthCodePkceSpotify::new(creds, oauth))))
+        .manage(Spotify(Mutex::new(AuthCodePkceSpotify::with_config(
+            Credentials::new_pkce(env!("RSPOTIFY_CLIENT_ID")),
+            OAuth {
+                redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
+                scopes: scopes!(
+                    "user-read-playback-state user-modify-playback-state user-library-read user-library-modify"
+                ),
+                ..Default::default()
+            },
+            Config::default(),
+        ))))
         .invoke_handler(generate_handler![
             authenticate,
+            deauthenticate,
             is_authenticated,
             get_playback_state,
             get_device_list,
@@ -67,4 +66,5 @@ fn main() {
         )
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+    log::info!("App started.");
 }

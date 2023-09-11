@@ -1,13 +1,13 @@
 {
-	"$schema": "../node_modules/@tauri-apps/cli/schema.json",
 	"build": {
 		"beforeBuildCommand": "npm run vite:build",
 		"beforeDevCommand": "npm run vite:dev",
-		"devPath": "http://localhost:5173",
+		"devPath": "http://localhost:1420",
+		"withGlobalTauri": false,
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "Spotlite",
+		"productName": "Soundcheck",
 		"version": "0.1.0"
 	},
 	"tauri": {
@@ -16,7 +16,8 @@
 			"window": {
 				"close": true,
 				"create": true,
-				"startDragging": true
+				"startDragging": true,
+				"setAlwaysOnTop": true
 			},
 			"clipboard": {
 				"writeText": true
@@ -25,41 +26,18 @@
 		"bundle": {
 			"active": true,
 			"category": "Music",
-			"copyright": "",
-			"deb": {
-				"depends": []
-			},
-			"externalBin": [],
+			"targets": "all",
+			"identifier": "Soundcheck",
 			"icon": [
 				"icons/32x32.png",
 				"icons/128x128.png",
 				"icons/128x128@2x.png",
 				"icons/icon.icns",
 				"icons/icon.ico"
-			],
-			"identifier": "Spotlite",
-			"longDescription": "",
-			"macOS": {
-				"entitlements": null,
-				"exceptionDomain": "",
-				"frameworks": [],
-				"providerShortName": null,
-				"signingIdentity": null
-			},
-			"resources": [],
-			"shortDescription": "",
-			"targets": "all",
-			"windows": {
-				"certificateThumbprint": null,
-				"digestAlgorithm": "sha256",
-				"timestampUrl": ""
-			}
+			]
 		},
 		"security": {
 			"csp": null
-		},
-		"updater": {
-			"active": false
 		},
 		"windows": [
 			{
@@ -71,7 +49,7 @@
 				"minHeight": 160,
 				"minWidth": 160,
 				"resizable": true,
-				"title": "Spotlite",
+				"title": "Soundcheck",
 				"width": 360
 			}
 		]

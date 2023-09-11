@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:700,500,400&display=swap');
+
+:root {
+	font-family: Roboto, Inter, Avenir, Helvetica, Arial, sans-serif;
+	color-scheme: dark;
+}
+
+* {
+	margin: 0;
+	user-select: none;
+}
+
+:is(body, #app) {
+	box-sizing: border-box;
+	padding: 0.35rem;
+}
+
+body {
+	height: 100vh;
+	overflow: hidden;
+	background-color: rgb(var(--sm3-scheme-color-inverse-primary));
+}
+
+#app {
+	height: 100%;
+	padding-bottom: 0;
+}

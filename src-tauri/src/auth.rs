@@ -1,4 +1,4 @@
-use rspotify::{prelude::*, AuthCodePkceSpotify};
+use rspotify::{prelude::*, AuthCodePkceSpotify, Token};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use tauri::{command, Manager, State, Window, WindowEvent, WindowUrl};
@@ -32,8 +32,19 @@ pub async fn is_authenticated(state: State<'_, Spotify>) -> Result<bool, ()> {
     let spotify = state.0.lock().unwrap().clone();
     let token = spotify.get_token().lock().await.unwrap().clone();
     match token {
-        Some(_token) => Ok(true),
-        None => Err(()),
+        Some(_) => Ok(true),
+        None => Ok(false),
+    }
+}
+
+#[command]
+pub async fn deauthenticate(state: State<'_, Spotify>) -> Result<bool, ()> {
+    let spotify = state.0.lock().unwrap().clone();
+    let new_token = Some(Token::default());
+    *spotify.get_token().lock().await.unwrap() = new_token;
+    match spotify.write_token_cache().await {
+        Ok(()) => Ok(false),
+        Err(_) => Err(()),
     }
 }
 
@@ -70,9 +81,7 @@ pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Resul
     }
 
     match TcpListener::bind(format!("127.0.0.1:{}", port)) {
-        // If the bind fails, handle the error and return early.
         Err(e) => {
-            // Special print for common case of socket already taken.
             if e.to_string().contains("(os error 10048)") {
                 log::error!("Failed to bind to 127.0.0.1:{}: Socket conflict", port);
             } else {
@@ -102,50 +111,44 @@ pub async fn handle_connection(
     let mut buffer = [0; 2048];
     stream.read(&mut buffer).unwrap();
 
-    // convert buffer into string and 'parse' the URL
-    match String::from_utf8(buffer.to_vec()) {
-        Ok(request) => {
-            let split: Vec<&str> = request.split_whitespace().collect();
-            if split.len() > 1 {
-                let host = &spotify.get_oauth().redirect_uri;
-                let path = &split[1].to_string();
-                match spotify.parse_response_code(&format!("{}{}", host, path)) {
-                    Some(code) => match spotify.request_token(&code).await {
-                        Ok(()) => {
-                            respond_with_success(stream);
-                            Ok(())
-                        }
-                        Err(e) => {
-                            respond_with_error(format!("Auth server error: {}", e), stream);
-                            Err(e.to_string())
-                        }
-                    },
-                    None => {
-                        respond_with_error("Auth server code returned error".to_string(), stream);
-                        Err(format!("Auth server code returned error"))
-                    }
+    if let Ok(request) = String::from_utf8(buffer.to_vec()) {
+        let split: Vec<&str> = request.split_whitespace().collect();
+        if split.len() <= 1 {
+            respond_with_error("Malformed request".to_string(), stream);
+            return Err("Malformed request".to_string());
+        }
+        let host = &spotify.get_oauth().redirect_uri;
+        let path = &split[1].to_string();
+        if let Some(code) = spotify.parse_response_code(&format!("{}{}", host, path)) {
+            match spotify.request_token(&code).await {
+                Ok(()) => {
+                    respond_with_success(stream);
+                    Ok(())
                 }
-            } else {
-                respond_with_error("Malformed request".to_string(), stream);
-                Err(format!("Malformed request"))
+                Err(e) => {
+                    respond_with_error(format!("Auth server error: {}", e), stream);
+                    Err(e.to_string())
+                }
             }
+        } else {
+            respond_with_error("Auth server code returned error".to_string(), stream);
+            Err("Auth server code returned error".to_string())
         }
-        Err(e) => {
-            respond_with_error(format!("Invalid UTF-8 sequence: {}", e), stream);
-            Err(format!("Invalid UTF-8 sequence: {}", e))
-        }
+    } else {
+        respond_with_error("Invalid UTF-8 sequence".to_string(), stream);
+        Err("Invalid UTF-8 sequence".to_string())
     }
 }
 
 fn respond_with_success(mut stream: TcpStream) {
-    let response = format!("HTTP/1.1 200 OK\r\n\r\nSuccess");
+    let response = "HTTP/1.1 200 OK\r\n\r\n";
     stream.write_all(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
 
-fn respond_with_error(e: String, mut stream: TcpStream) {
-    log::error!("Error: {}", e);
-    let response = format!("HTTP/1.1 400 Bad Request\r\n\r\n400 - Bad Request - {}", e);
+fn respond_with_error(message: String, mut stream: TcpStream) {
+    log::error!("Error: {}", message);
+    let response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n{}", message);
     stream.write_all(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
