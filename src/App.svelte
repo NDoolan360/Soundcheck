@@ -40,10 +40,7 @@
 		track: 'off',
 	} as { [name: string]: RepeatState };
 	const reload = <T,>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
-		setTimeout(
-			() => isReloadable(loadbale) && loadbale.reload().then(cb),
-			delay,
-		);
+		setTimeout(() => isReloadable(loadbale) && loadbale.reload().then(cb), delay);
 	};
 	const loadingState = (delay: number) => {
 		stateLoading = true;
@@ -76,12 +73,7 @@
 			1000,
 			990,
 		);
-		return () =>
-			[
-				autoReloadState,
-				autoReloadDevices,
-				optimiticProgressUpdate,
-			].forEach(clearInterval);
+		return () => [autoReloadState, autoReloadDevices, optimiticProgressUpdate].forEach(clearInterval);
 	});
 
 	$: {
@@ -101,11 +93,7 @@
 
 {#if (screenInactive && interactiveOnHover) || alwaysShowArtwork}
 	{#if artworkFillMode != 'cover' || $images.at(-1)?.url === './ambient.gif'}
-		<div
-			id="blurred-image"
-			style:background-image="url({$images.at(-1)?.url})"
-			transition:blur|global
-		/>
+		<div id="blurred-image" style:background-image="url({$images.at(-1)?.url})" transition:blur|global />
 	{/if}
 	{#if $images.at(-1)?.url != './ambient.gif'}
 		<img
@@ -124,10 +112,7 @@
 			<Button id="spotify-logo" on:click={() => (menuOpen = !menuOpen)}>
 				<svg slot="button-icon" viewBox="0 0 512 512">
 					<path stroke-width="50" d="M95 173s170-49 317 33" />
-					<path
-						stroke-width="42.5"
-						d="M109 256s139-45 271 32m-186-17"
-					/>
+					<path stroke-width="42.5" d="M109 256s139-45 271 32m-186-17" />
 					<path stroke-width="33.3" d="M116 334s139-39 235 26" />
 				</svg>
 			</Button>
@@ -148,12 +133,9 @@
 						<select
 							id="device-list"
 							bind:value={$activeDevice}
-							disabled={$devices.length == 0 ||
-								$disallows.transferringPlayback}
+							disabled={$devices.length == 0 || $disallows.transferringPlayback}
 						>
-							<option hidden disabled selected value={null}>
-								None
-							</option>
+							<option hidden disabled selected value={null}> None </option>
 							{#each $devices as device (device.id)}
 								<option value={device.id}>
 									{device.name}
@@ -173,96 +155,41 @@
 					<Button
 						id="copy-link"
 						on:click={() => {
-							if ($songLink)
-								clipboard
-									.writeText($songLink)
-									.then(triggerCopiedSnackbar);
+							if ($songLink) clipboard.writeText($songLink).then(triggerCopiedSnackbar);
 						}}
 						disabled={$disallows.link}
 					>
 						Copy Song Link
 					</Button>
-					<Button
-						id="deep-link"
-						href={$deepLink}
-						disabled={$disallows.link}>Open in Spotify</Button
-					>
+					<Button id="deep-link" href={$deepLink} disabled={$disallows.link}>Open in Spotify</Button>
 					<hr />
 					<h3>Settings</h3>
 					<span>
 						<label for="dark-mode">Dark Mode:</label>
 						<Switch label="dark-mode" bind:checked={darkMode}>
-							<i
-								slot="switch-unchecked-icon"
-								class="material-symbols-outlined"
-							>
-								light_mode
-							</i>
-							<i
-								slot="switch-checked-icon"
-								class="material-symbols-outlined"
-							>
-								dark_mode
-							</i>
+							<i slot="switch-unchecked-icon" class="material-symbols-outlined"> light_mode </i>
+							<i slot="switch-checked-icon" class="material-symbols-outlined"> dark_mode </i>
 						</Switch>
 					</span>
 					<span>
 						<label for="keep-on-top">Keep On Top:</label>
 						<Switch label="keep-on-top" bind:checked={keepOnTop}>
-							<i
-								slot="switch-unchecked-icon"
-								class="material-symbols-outlined"
-							>
-								layers_clear
-							</i>
-							<i
-								slot="switch-checked-icon"
-								class="material-symbols-outlined"
-							>
-								layers
-							</i>
+							<i slot="switch-unchecked-icon" class="material-symbols-outlined"> layers_clear </i>
+							<i slot="switch-checked-icon" class="material-symbols-outlined"> layers </i>
 						</Switch>
 					</span>
 					<span>
-						<label for="interactive-on-hover"
-							>Interactive Only On Hover:</label
-						>
-						<Switch
-							label="interactive-on-hover"
-							bind:checked={interactiveOnHover}
-						>
-							<i
-								slot="switch-unchecked-icon"
-								class="material-symbols-outlined"
-							>
-								do_not_touch
-							</i>
-							<i
-								slot="switch-checked-icon"
-								class="material-symbols-outlined"
-							>
-								hand_gesture
-							</i>
+						<label for="interactive-on-hover">Interactive Only On Hover:</label>
+						<Switch label="interactive-on-hover" bind:checked={interactiveOnHover}>
+							<i slot="switch-unchecked-icon" class="material-symbols-outlined"> do_not_touch </i>
+							<i slot="switch-checked-icon" class="material-symbols-outlined"> hand_gesture </i>
 						</Switch>
 					</span>
 					<span>
 						<label for="enforce-art">Always Show Artwork:</label>
-						<Switch
-							label="enforce-art"
-							bind:checked={alwaysShowArtwork}
-						>
-							<i
-								slot="switch-unchecked-icon"
-								class="material-symbols-outlined"
-							>
-								hide_image
-							</i>
-							<i
-								slot="switch-checked-icon"
-								class="material-symbols-outlined"
-							>
-								image
-							</i>
+						<Switch label="enforce-art" bind:checked={alwaysShowArtwork}>
+							<i slot="switch-unchecked-icon" class="material-symbols-outlined"> hide_image </i>
+							<i slot="switch-checked-icon" class="material-symbols-outlined"> image </i>
 						</Switch>
 					</span>
 					<span>
@@ -274,13 +201,7 @@
 					</span>
 				</div>
 			{/if}
-			<Snackbar
-				dismissable
-				width="fit-content"
-				bind:open={triggerCopiedSnackbar}
-			>
-				Link Copied
-			</Snackbar>
+			<Snackbar dismissable width="fit-content" bind:open={triggerCopiedSnackbar}>Link Copied</Snackbar>
 			<aside id="close">
 				<Button
 					id="close-button"
@@ -289,9 +210,7 @@
 						window.WebviewWindow.getByLabel('auth')?.close();
 					}}
 				>
-					<i slot="button-icon" class="material-symbols-outlined">
-						close
-					</i>
+					<i slot="button-icon" class="material-symbols-outlined"> close </i>
 				</Button>
 			</aside>
 		</section>
@@ -312,11 +231,7 @@
 					>
 						<i slot="button-icon" class="material-symbols-outlined">
 							{#if stateLoading}
-								<ProgressIndicator
-									label="loading-state-fab"
-									circular
-									indeterminate
-								/>
+								<ProgressIndicator label="loading-state-fab" circular indeterminate />
 							{:else}
 								{$playing ? 'pause' : 'play_arrow'}
 							{/if}
@@ -331,17 +246,10 @@
 					<Button
 						id="replay-10"
 						type="standard"
-						on:click={() =>
-							($progress = clamp(
-								0,
-								$progress - 10000,
-								$duration
-							))}
+						on:click={() => ($progress = clamp(0, $progress - 10000, $duration))}
 						disabled={$disallows.seeking}
 					>
-						<i slot="button-icon" class="material-symbols-outlined">
-							replay_10
-						</i>
+						<i slot="button-icon" class="material-symbols-outlined"> replay_10 </i>
 					</Button>
 				</span>
 			{/if}
@@ -350,15 +258,10 @@
 					<Button
 						id="skip-previous"
 						type="standard"
-						on:click={() =>
-							invoke('previous_track').then(() =>
-								loadingState(500)
-							)}
+						on:click={() => invoke('previous_track').then(() => loadingState(500))}
 						disabled={$disallows.skippingPrev}
 					>
-						<i slot="button-icon" class="material-symbols-outlined">
-							skip_previous
-						</i>
+						<i slot="button-icon" class="material-symbols-outlined"> skip_previous </i>
 					</Button>
 				</span>
 			{/if}
@@ -382,11 +285,7 @@
 					>
 						<i slot="button-icon" class="material-symbols-outlined">
 							{#if stateLoading}
-								<ProgressIndicator
-									label="loading-state"
-									circular
-									indeterminate
-								/>
+								<ProgressIndicator label="loading-state" circular indeterminate />
 							{:else}
 								{$playing ? 'pause' : 'play_arrow'}
 							{/if}
@@ -399,13 +298,10 @@
 					<Button
 						id="skip-next"
 						type="standard"
-						on:click={() =>
-							invoke('next_track').then(() => loadingState(500))}
+						on:click={() => invoke('next_track').then(() => loadingState(500))}
 						disabled={$disallows.skippingNext}
 					>
-						<i slot="button-icon" class="material-symbols-outlined">
-							skip_next
-						</i>
+						<i slot="button-icon" class="material-symbols-outlined"> skip_next </i>
 					</Button>
 				</span>
 			{/if}
@@ -418,12 +314,7 @@
 							on:click={() => ($liked = !$liked)}
 							disabled={$disallows.togglingLike}
 						>
-							<i
-								slot="button-icon"
-								class="material-symbols-outlined"
-							>
-								favorite
-							</i>
+							<i slot="button-icon" class="material-symbols-outlined"> favorite </i>
 						</Button>
 					</span>
 				{/if}
@@ -435,12 +326,7 @@
 							on:click={() => ($shuffle = !$shuffle)}
 							disabled={$disallows.togglingShuffle}
 						>
-							<i
-								slot="button-icon"
-								class="material-symbols-outlined"
-							>
-								shuffle
-							</i>
+							<i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
 						</Button>
 					</span>
 				{/if}
@@ -452,10 +338,7 @@
 							on:click={() => ($repeat = repeatMap[$repeat])}
 							disabled={$disallows.togglingRepeat}
 						>
-							<i
-								slot="button-icon"
-								class="material-symbols-outlined"
-							>
+							<i slot="button-icon" class="material-symbols-outlined">
 								{$repeat == 'track' ? 'repeat_one' : 'repeat'}
 							</i>
 						</Button>
@@ -466,17 +349,10 @@
 					<Button
 						id="forward-10"
 						type="standard"
-						on:click={() =>
-							($progress = clamp(
-								0,
-								$progress + 10000,
-								$duration
-							))}
+						on:click={() => ($progress = clamp(0, $progress + 10000, $duration))}
 						disabled={$disallows.seeking}
 					>
-						<i slot="button-icon" class="material-symbols-outlined">
-							forward_10
-						</i>
+						<i slot="button-icon" class="material-symbols-outlined"> forward_10 </i>
 					</Button>
 				</span>
 			{/if}
