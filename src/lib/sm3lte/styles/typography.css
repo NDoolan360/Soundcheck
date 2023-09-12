@@ -23,9 +23,7 @@
 	--sm3-sys-typescale-label-small-size: 11px;
 
 	/* Label Small font weight */
-	--sm3-sys-typescale-label-small-weight: var(
-		--sm3-ref-typeface-weight-medium
-	);
+	--sm3-sys-typescale-label-small-weight: var(--sm3-ref-typeface-weight-medium);
 
 	/* Label Small font name */
 	--sm3-sys-typescale-label-small-font: var(--sm3-ref-typeface-plain);
@@ -54,9 +52,7 @@
 	--sm3-sys-typescale-label-medium-size: 12px;
 
 	/* Label Medium font weight */
-	--sm3-sys-typescale-label-medium-weight: var(
-		--sm3-ref-typeface-weight-medium
-	);
+	--sm3-sys-typescale-label-medium-weight: var(--sm3-ref-typeface-weight-medium);
 
 	/* Label Medium font name */
 	--sm3-sys-typescale-label-medium-font: var(--sm3-ref-typeface-plain);
@@ -83,9 +79,7 @@
 	--sm3-sys-typescale-label-large-size: 14px;
 
 	/* Label Large font weight */
-	--sm3-sys-typescale-label-large-weight: var(
-		--sm3-ref-typeface-weight-medium
-	);
+	--sm3-sys-typescale-label-large-weight: var(--sm3-ref-typeface-weight-medium);
 
 	/* Label Large font name */
 	--sm3-sys-typescale-label-large-font: var(--sm3-ref-typeface-plain);
@@ -112,9 +106,7 @@
 	--sm3-sys-typescale-body-small-size: 12px;
 
 	/* Body Small font weight */
-	--sm3-sys-typescale-body-small-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-body-small-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Body Small font name */
 	--sm3-sys-typescale-body-small-font: var(--sm3-ref-typeface-plain);
@@ -141,9 +133,7 @@
 	--sm3-sys-typescale-body-medium-size: 14px;
 
 	/* Body Medium font weight */
-	--sm3-sys-typescale-body-medium-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-body-medium-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Body Medium font name */
 	--sm3-sys-typescale-body-medium-font: var(--sm3-ref-typeface-plain);
@@ -170,9 +160,7 @@
 	--sm3-sys-typescale-body-large-size: 16px;
 
 	/* Body Large font weight */
-	--sm3-sys-typescale-body-large-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-body-large-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Body Large font name */
 	--sm3-sys-typescale-body-large-font: var(--sm3-ref-typeface-plain);
@@ -199,9 +187,7 @@
 	--sm3-sys-typescale-title-small-size: 14px;
 
 	/* Title Small font weight */
-	--sm3-sys-typescale-title-small-weight: var(
-		--sm3-ref-typeface-weight-medium
-	);
+	--sm3-sys-typescale-title-small-weight: var(--sm3-ref-typeface-weight-medium);
 
 	/* Title Small font name */
 	--sm3-sys-typescale-title-small-font: var(--sm3-ref-typeface-plain);
@@ -228,9 +214,7 @@
 	--sm3-sys-typescale-title-medium-size: 16px;
 
 	/* Title Medium font weight */
-	--sm3-sys-typescale-title-medium-weight: var(
-		--sm3-ref-typeface-weight-medium
-	);
+	--sm3-sys-typescale-title-medium-weight: var(--sm3-ref-typeface-weight-medium);
 
 	/* Title Medium font name */
 	--sm3-sys-typescale-title-medium-font: var(--sm3-ref-typeface-plain);
@@ -257,9 +241,7 @@
 	--sm3-sys-typescale-title-large-size: 22px;
 
 	/* Title Large font weight */
-	--sm3-sys-typescale-title-large-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-title-large-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Title Large font name */
 	--sm3-sys-typescale-title-large-font: var(--sm3-ref-typeface-brand);
@@ -286,9 +268,7 @@
 	--sm3-sys-typescale-headline-small-size: 24px;
 
 	/* Headline Small font weight */
-	--sm3-sys-typescale-headline-small-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-headline-small-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Headline Small font name */
 	--sm3-sys-typescale-headline-small-font: var(--sm3-ref-typeface-brand);
@@ -315,9 +295,7 @@
 	--sm3-sys-typescale-headline-medium-size: 28px;
 
 	/* Headline Medium font weight */
-	--sm3-sys-typescale-headline-medium-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-headline-medium-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Headline Medium font name */
 	--sm3-sys-typescale-headline-medium-font: var(--sm3-ref-typeface-brand);
@@ -347,9 +325,7 @@
 	--sm3-sys-typescale-headline-large-font: var(--sm3-ref-typeface-brand);
 
 	/* Headline Large font weight */
-	--sm3-sys-typescale-headline-large-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-headline-large-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Display Small */
 	--sm3-sys-typescale-display-small-text-transform: unset;
@@ -373,9 +349,7 @@
 	--sm3-sys-typescale-display-small-size: 36px;
 
 	/* Display Small font weight */
-	--sm3-sys-typescale-display-small-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-display-small-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Display Small font name */
 	--sm3-sys-typescale-display-small-font: var(--sm3-ref-typeface-brand);
@@ -402,9 +376,7 @@
 	--sm3-sys-typescale-display-medium-size: 45px;
 
 	/* Display Medium font weight */
-	--sm3-sys-typescale-display-medium-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-display-medium-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Display Medium font name */
 	--sm3-sys-typescale-display-medium-font: var(--sm3-ref-typeface-brand);
@@ -431,9 +403,7 @@
 	--sm3-sys-typescale-display-large-size: 57px;
 
 	/* Display Large font weight */
-	--sm3-sys-typescale-display-large-weight: var(
-		--sm3-ref-typeface-weight-regular
-	);
+	--sm3-sys-typescale-display-large-weight: var(--sm3-ref-typeface-weight-regular);
 
 	/* Display Large font name */
 	--sm3-sys-typescale-display-large-font: var(--sm3-ref-typeface-brand);

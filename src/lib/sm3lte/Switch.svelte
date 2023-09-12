@@ -64,13 +64,13 @@
 				--sm3-comp-switch-color-foreground-off,
 				rgb(var(--sm3-scheme-color-outline))
 			);
-		background-color: var(
-			--sm3-comp-switch-color-background-off,
-			rgb(var(--sm3-scheme-color-surface-container-highest))
-		);
 		border-radius: var(
 			--sm3-comp-switch-size-radius,
 			var(--sm3-sys-shape-corner-full-default-size)
+		);
+		background-color: var(
+			--sm3-comp-switch-color-background-off,
+			rgb(var(--sm3-scheme-color-surface-container-highest))
 		);
 		cursor: pointer;
 		transition:
@@ -83,31 +83,16 @@
 		--_height: var(--sm3-comp-switch-size-height, 32px);
 	}
 
-	button.checked {
-		border-color: transparent;
-		background-color: var(
-			--sm3-comp-switch-color-background-on,
-			rgb(var(--sm3-scheme-color-primary))
-		);
-	}
-
 	button::before {
 		position: absolute;
 		border-radius: inherit;
+		background-color: var(
+			--sm3-comp-switch-color-background-on,
+			rgb(var(--sm3-scheme-color-primary))
+		);
 		content: '';
 		inset: 0;
-		background-color: var(
-			--sm3-comp-switch-color-background-on,
-			rgb(var(--sm3-scheme-color-primary))
-		);
 		opacity: 0;
-	}
-
-	button.checked::before {
-		background-color: var(
-			--sm3-comp-switch-color-background-on,
-			rgb(var(--sm3-scheme-color-primary))
-		);
 	}
 
 	button:hover:not(:disabled)::before {
@@ -129,18 +114,23 @@
 		);
 	}
 
+	button.checked {
+		border-color: transparent;
+		background-color: var(
+			--sm3-comp-switch-color-background-on,
+			rgb(var(--sm3-scheme-color-primary))
+		);
+	}
+
+	button.checked::before {
+		background-color: var(
+			--sm3-comp-switch-color-background-on,
+			rgb(var(--sm3-scheme-color-primary))
+		);
+	}
+
 	button.checked:disabled {
 		background-color: rgb(var(--sm3-scheme-color-on-surface) / 12%);
-	}
-
-	button:disabled span {
-		background-color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
-		color: rgb(var(--sm3-scheme-color-surface));
-	}
-
-	button.checked:disabled span {
-		background-color: rgb(var(--sm3-scheme-color-surface));
-		color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
 	}
 
 	span {
@@ -186,9 +176,19 @@
 		margin: 0 12.5%;
 	}
 
+	button:disabled span {
+		background-color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
+		color: rgb(var(--sm3-scheme-color-surface));
+	}
+
 	button.checked span:not(.icon) {
 		height: 75%;
 		margin: 0 6.75%;
+	}
+
+	button.checked:disabled span {
+		background-color: rgb(var(--sm3-scheme-color-surface));
+		color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
 	}
 
 	div {

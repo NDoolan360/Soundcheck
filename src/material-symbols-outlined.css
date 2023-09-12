@@ -3,7 +3,7 @@
 	font-style: normal;
 	font-weight: 400;
 	font-variation-settings: 'FILL' 0;
-	src: url(/fonts/material-symbols-outlined.woff2) format('woff2');
+	src: url('/fonts/material-symbols-outlined.woff2') format('woff2');
 }
 
 .material-symbols-outlined {

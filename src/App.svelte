@@ -469,8 +469,8 @@
 
 <style>
     main {
-        height: 100%;
         display: flex;
+        height: 100%;
         flex-direction: column;
         justify-content: space-between;
     }
@@ -481,25 +481,24 @@
 
     :is(div, hgroup) {
         display: flex;
-        pointer-events: none;
         flex-direction: column;
         justify-content: start;
+        pointer-events: none;
     }
 
     :is(section, span) {
         display: flex;
         max-width: 100%;
-        pointer-events: none;
-        flex-wrap: wrap;
-        flex-direction: row;
+        flex-flow: row wrap;
         align-items: center;
         justify-content: space-between;
         gap: 0.35rem;
+        pointer-events: none;
     }
 
     input[type='range'] {
-        flex: 1 1;
         min-width: 5rem;
+        flex: 1 1;
     }
 
     hr {
@@ -509,16 +508,18 @@
 
     :is(img, #blurred-image, #vignette) {
         position: absolute;
-        inset: 0;
+        z-index: -10;
         width: 100%;
         height: 100%;
-        z-index: -10;
+        inset: 0;
     }
+
     #blurred-image {
-        background-size: cover;
         background-position: center;
+        background-size: cover;
         filter: blur(12px);
     }
+
     #vignette {
         background-color: rgb(var(--sm3-scheme-color-inverse-primary) / 40%);
         box-shadow: inset 0 0 80px rgb(var(--sm3-scheme-color-inverse-primary));
@@ -536,9 +537,9 @@
     }
 
     :global(:is(#logout, #login, #copy-link, #deep-link)) {
-        white-space: normal;
-        padding: 0 12px;
         min-height: fit-content;
+        padding: 0 12px;
+        white-space: normal;
     }
 
     #close :global(#close-button) {
@@ -553,6 +554,7 @@
         --sm3-comp-button-color-text: white;
         --sm3-comp-button-color-background: transparent;
     }
+
     #close :global(#close-button:is(:hover, :focus-visible)) {
         --sm3-comp-button-color-background: red;
     }
@@ -561,15 +563,15 @@
         position: absolute;
         z-index: 9;
         top: 2rem;
-        max-height: calc(100vh - 4rem);
         max-width: calc(100vw - 2.5rem);
-        pointer-events: auto;
-        color: rgb(var(--sm3-scheme-color-on-surface-container));
-        background-color: rgb(var(--sm3-scheme-color-surface-container));
-        border-radius: 0.5rem;
-        overflow-y: auto;
+        max-height: calc(100vh - 4rem);
         padding: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: rgb(var(--sm3-scheme-color-surface-container));
+        color: rgb(var(--sm3-scheme-color-on-surface-container));
         gap: 1rem;
+        overflow-y: auto;
+        pointer-events: auto;
 
         --sm3-comp-switch-size-height: 1.5rem;
         --sm3-comp-switch-size-width: 2.5rem;
@@ -578,13 +580,15 @@
     #info {
         flex-wrap: nowrap;
     }
+
     #info hgroup {
         overflow: hidden;
     }
+
     #info hgroup * {
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     #controls :global(.standard) {
