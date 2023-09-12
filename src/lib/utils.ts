@@ -34,3 +34,9 @@ export const gainFocus = (node: HTMLElement, callback: Function) =>
 			if (node.contains(target as HTMLElement)) callback();
 		},
 	);
+
+// Util for converting raw times to pretty times
+export const prettyTime = (rawTime: number) => {
+	const date = new Date(rawTime ?? 0);
+	return date.getUTCHours() > 0 ? date.toISOString().substring(11, 19) : date.toISOString().substring(14, 19);
+};
