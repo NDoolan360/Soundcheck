@@ -19,18 +19,23 @@ use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
 
 pub struct Spotify(Mutex<AuthCodePkceSpotify>);
 
+pub const SPOTIFY_REQUIRED_SCOPES: &str =
+    "user-read-playback-state user-modify-playback-state user-library-read user-library-modify";
+pub const SPOTIFY_CACHE_FILENAME: &str = ".spotify-token-cache";
+
 fn main() {
     Builder::default()
         .manage(Spotify(Mutex::new(AuthCodePkceSpotify::with_config(
             Credentials::new_pkce(env!("RSPOTIFY_CLIENT_ID")),
             OAuth {
                 redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
-                scopes: scopes!(
-                    "user-read-playback-state user-modify-playback-state user-library-read user-library-modify"
-                ),
+                scopes: scopes!(SPOTIFY_REQUIRED_SCOPES),
                 ..Default::default()
             },
-            Config::default(),
+            Config {
+                token_cached: true,
+                ..Default::default()
+            },
         ))))
         .invoke_handler(generate_handler![
             authenticate,
@@ -52,6 +57,13 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("player").unwrap();
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
+            // Set cache path location for rspotify cached token
+            if let Some(state) = app.try_state::<Spotify>() {
+                state.0.lock().unwrap().config.cache_path =
+                    tauri::api::path::app_data_dir(&app.config())
+                        .expect("No cache directory found in app")
+                        .join(SPOTIFY_CACHE_FILENAME);
+            }
             Ok(())
         })
         .on_window_event(|e| {
@@ -59,6 +71,8 @@ fn main() {
                 std::thread::sleep(std::time::Duration::from_nanos(1));
             }
         })
+        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([LogDir, Stdout, Webview])
