@@ -10,11 +10,11 @@ edition = "2021"
 rust-version = "1.60"
 
 [build-dependencies]
-tauri-build = { version = "1.4", features = [] }
+tauri-build = { version = "1.5", features = [] }
 dotenv-build = "0.1"
 
 [dependencies]
-tauri = { version = "1.4", features = [
+tauri = { version = "1.5", features = [
     "clipboard-write-text",
     "window-close",
     "window-create",
@@ -23,11 +23,13 @@ tauri = { version = "1.4", features = [
 ] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-window-shadows = "0.2.1"
+window-shadows = "0.2"
 rspotify = { git = "https://github.com/NDoolan360/rspotify" }
-log = "0.4.17"
-chrono = "0.4.24"
+log = "0.4"
+chrono = "0.4"
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
