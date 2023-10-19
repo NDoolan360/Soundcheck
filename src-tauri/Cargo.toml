@@ -30,6 +30,7 @@ chrono = "0.4"
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+url = "2.4.1"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

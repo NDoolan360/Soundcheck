@@ -1,7 +1,8 @@
 use rspotify::{prelude::*, AuthCodePkceSpotify, Token};
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
+use std::net::{TcpListener, TcpStream, ToSocketAddrs};
 use tauri::{command, Manager, State, Window, WindowEvent, WindowUrl};
+use url::Url;
 
 use crate::Spotify;
 
@@ -58,12 +59,21 @@ pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Resul
     );
 
     log::info!("Authenticating...");
-    let port = spotify
-        .get_oauth()
-        .redirect_uri
-        .split(':')
-        .last()
-        .expect("Could not find port in redirect URI.");
+    let redirect: Url = spotify.get_oauth().redirect_uri.parse::<Url>().unwrap();
+    let host = redirect
+        .host_str()
+        .expect("No host found in SPOTIFY_REDIRECT_URI.");
+    let port = redirect
+        .port()
+        .expect("No port found in SPOTIFY_REDIRECT_URI.");
+
+    println!("{:#?}", redirect);
+
+    let address = format!("{host}:{port}")
+        .to_socket_addrs()
+        .expect("Could not parse SPOTIFY_REDIRECT_URI address correctly.")
+        .next()
+        .expect("No valid address found in SPOTIFY_REDIRECT_URI.");
 
     let borrowed_window = window.clone();
     if window.get_window("auth").is_none() {
@@ -80,12 +90,12 @@ pub fn start_server(window: &Window, spotify: &mut AuthCodePkceSpotify) -> Resul
             })
     }
 
-    match TcpListener::bind(format!("127.0.0.1:{}", port)) {
+    match TcpListener::bind(address) {
         Err(e) => {
             if e.to_string().contains("(os error 10048)") {
-                log::error!("Failed to bind to 127.0.0.1:{}: Socket conflict", port);
+                log::error!("Failed to bind to {:#?}: Socket conflict", address);
             } else {
-                log::error!("Failed to bind to 127.0.0.1:{}: {}", port, e);
+                log::error!("Failed to bind to {:#?}: {}", address, e);
             }
         }
         Ok(listener) => {
