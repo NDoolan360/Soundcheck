@@ -4,7 +4,7 @@ A desktop spotify mini player.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install`, start a development server:
+Once you've created a project and installed dependencies with `npm install`, start a development server by running:
 
 ```bash
 npm run dev
@@ -12,17 +12,18 @@ npm run dev
 
 ## Building
 
-To create a production version of your app:
+After creating an app in the Spotify for Developers Dashboard ([Guide](https://developer.spotify.com/documentation/web-api/tutorials/getting-started?offset=-165#create-an-app)), include your client id and redirect uri in a `.env` file in the root directory.
+(Make sure your redirect URI has protocol and host, `http` and `localhost` respectively.)
+
+```env
+SPOTIFY_CLIENT_ID=<your spotify client id>
+SPOTIFY_REDIRECT_URI=http://localhost:<port number>
+```
+
+Then to create the production version of your app run:
 
 ```bash
 npm run build
-```
-
-Make sure to have a `.env` file in the root directory containing:
-
-```text
-RSPOTIFY_CLIENT_ID=<your spotify client id>
-RSPOTIFY_REDIRECT_URI=http://localhost:<port number>
 ```
 
 It will detect your operating system and build a bundle accordingly. The result will be located in `src-tauri/target/release`.
@@ -31,4 +32,7 @@ For more information about building applications for different platforms check o
 
 ## Recommended IDE Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+-   [VS Code](https://code.visualstudio.com/)
+-   [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
+-   [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
+-   [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).

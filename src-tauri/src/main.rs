@@ -26,9 +26,9 @@ pub const SPOTIFY_CACHE_FILENAME: &str = ".spotify-token-cache";
 fn main() {
     Builder::default()
         .manage(Spotify(Mutex::new(AuthCodePkceSpotify::with_config(
-            Credentials::new_pkce(env!("RSPOTIFY_CLIENT_ID")),
+            Credentials::new_pkce(env!("SPOTIFY_CLIENT_ID")),
             OAuth {
-                redirect_uri: env!("RSPOTIFY_REDIRECT_URI").into(),
+                redirect_uri: env!("SPOTIFY_REDIRECT_URI").into(),
                 scopes: scopes!(SPOTIFY_REQUIRED_SCOPES),
                 ..Default::default()
             },
