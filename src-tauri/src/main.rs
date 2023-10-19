@@ -13,8 +13,9 @@ use crate::playback::{
 };
 
 use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
+use std::num::ParseIntError;
 use std::sync::Mutex;
-use tauri::{generate_handler, Builder, Manager, WindowEvent};
+use tauri::{command, generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
 
 pub struct Spotify(Mutex<AuthCodePkceSpotify>);
@@ -22,6 +23,14 @@ pub struct Spotify(Mutex<AuthCodePkceSpotify>);
 pub const SPOTIFY_REQUIRED_SCOPES: &str =
     "user-read-playback-state user-modify-playback-state user-library-read user-library-modify";
 pub const SPOTIFY_CACHE_FILENAME: &str = ".spotify-token-cache";
+
+#[command]
+fn refresh_rate() -> Result<u32, String> {
+    match option_env!("REFRESH_RATE") {
+        Some(refresh_rate) => refresh_rate.parse::<u32>().map_err(|e| e.to_string()),
+        None => Ok(5000),
+    }
+}
 
 fn main() {
     Builder::default()
@@ -39,20 +48,21 @@ fn main() {
         ))))
         .invoke_handler(generate_handler![
             authenticate,
-            deauthenticate,
-            is_authenticated,
-            get_playback_state,
-            get_device_list,
             check_liked,
+            deauthenticate,
+            get_device_list,
+            get_playback_state,
+            is_authenticated,
             next_track,
             previous_track,
+            refresh_rate,
             seek,
+            set_device,
             set_liked,
             set_playing,
             set_repeat,
             set_shuffle,
             set_volume,
-            set_device
         ])
         .setup(|app| {
             let window = app.get_window("player").unwrap();

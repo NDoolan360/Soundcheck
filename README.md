@@ -30,6 +30,12 @@ It will detect your operating system and build a bundle accordingly. The result 
 
 For more information about building applications for different platforms check out [the official documentation](https://tauri.app/v1/guides/building/)
 
+### Build-time Options
+
+Options specified in the `.env` file that varying dictate behaviour of builds.
+
+-   `REFRESH_RATE`: The frequency that the playback state is refreshed (in ms). Default: `5000`
+
 ## Recommended IDE Setup
 
 -   [VS Code](https://code.visualstudio.com/)

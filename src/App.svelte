@@ -59,8 +59,12 @@
     loseFocus(document.body, () => (screenInactive = true));
 
     onMount(() => {
-        const autoReloadState = setInterval(reload, 5000, state);
-        const autoReloadDevices = setInterval(reload, 15000, devices);
+        let autoReloadState: number;
+        let autoReloadDevices: number;
+        invoke<number>('refresh_rate', {}).then((refresh_rate) => {
+            autoReloadState = setInterval(reload, refresh_rate, state);
+            autoReloadDevices = setInterval(reload, refresh_rate * 3, devices);
+        });
         const optimiticProgressUpdate = setInterval(
             (delta: number) => {
                 if ($playing && displayedProgress + delta > $duration) {
