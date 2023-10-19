@@ -13,7 +13,6 @@ use crate::playback::{
 };
 
 use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
-use std::num::ParseIntError;
 use std::sync::Mutex;
 use tauri::{command, generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};

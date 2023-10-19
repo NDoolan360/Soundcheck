@@ -13,7 +13,7 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<b
     }
     if let Some(auth_window) = window.get_window("auth") {
         auth_window.set_focus().unwrap();
-        return Err(format!("Auth window is already open, try again"));
+        return Err("Auth window is already open, try again".to_string());
     }
     let mut spotify = state.0.lock().unwrap().clone();
     match start_server(&window, &mut spotify) {
@@ -24,7 +24,7 @@ pub async fn authenticate(window: Window, state: State<'_, Spotify>) -> Result<b
             }
             Err(e) => Err(e),
         },
-        Err(()) => Err(format!("Auth server stream error")),
+        Err(()) => Err("Auth server stream error".to_string()),
     }
 }
 
@@ -119,7 +119,7 @@ pub async fn handle_connection(
     spotify: &mut AuthCodePkceSpotify,
 ) -> Result<(), String> {
     let mut buffer = [0; 2048];
-    stream.read(&mut buffer).unwrap();
+    stream.read_exact(&mut buffer).unwrap();
 
     if let Ok(request) = String::from_utf8(buffer.to_vec()) {
         let split: Vec<&str> = request.split_whitespace().collect();

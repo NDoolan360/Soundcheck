@@ -15,7 +15,7 @@ pub async fn get_playback_state(
     spotify
         .current_playback(None, Some([&Track, &Episode]))
         .await
-        .or_else(|e| Err(format!("{:#?}", e)))
+        .map_err(|e| format!("{:#?}", e))
 }
 
 #[command]
@@ -129,7 +129,7 @@ pub async fn check_liked(track_id: String, state: State<'_, Spotify>) -> Result<
             if item.track.is_local {
                 return Err("Track is local, cannot save it.".to_string());
             }
-            if item.track.id.unwrap().id() == &track_id {
+            if item.track.id.unwrap().id() == track_id {
                 return Ok(true);
             }
         }
