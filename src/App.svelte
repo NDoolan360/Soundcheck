@@ -3,13 +3,14 @@
     import { clipboard, invoke, window } from '@tauri-apps/api';
     import { onMount } from 'svelte';
     import { get } from 'svelte/store';
-    import { blur, fade, slide } from 'svelte/transition';
+    import { fade, slide } from 'svelte/transition';
+    import ProgressBar from './lib/components/ProgressBar.svelte';
+    import { alwaysShowArtwork, artworkFillMode, darkMode, interactiveOnHover, keepOnTop } from './lib/settings';
     import Button from './lib/sm3lte/Button.svelte';
     import { updateStyleSheet } from './lib/sm3lte/MaterialThemeController';
     import ProgressIndicator from './lib/sm3lte/ProgressIndicator.svelte';
     import Snackbar from './lib/sm3lte/Snackbar.svelte';
     import Switch from './lib/sm3lte/Switch.svelte';
-    import ProgressBar from './lib/components/ProgressBar.svelte';
     import {
         activeDevice,
         authenticated,
@@ -33,7 +34,6 @@
         type RepeatState,
     } from './lib/stores';
     import { clamp, gainFocus, loseFocus } from './lib/utils';
-    import { darkMode, keepOnTop, interactiveOnHover, alwaysShowArtwork, artworkFillMode } from './lib/settings';
 
     const repeatMap = {
         off: 'context',
@@ -94,7 +94,7 @@
 
 {#if (screenInactive && $interactiveOnHover) || $alwaysShowArtwork}
     {#if $artworkFillMode != 'cover' || $images.at(-1)?.url === './ambient.gif'}
-        <div id="lowres-image" style:background-image="url({$images.at(-1)?.url})" transition:blur|global />
+        <div id="lowres-image" style:background-image="url({$images.at(-1)?.url})" transition:fade|global />
     {/if}
     {#if $images.at(-1)?.url != './ambient.gif'}
         <img
@@ -102,7 +102,7 @@
             alt="Track Art"
             src={$images.at(0)?.url}
             style:object-fit={$artworkFillMode}
-            transition:blur|global
+            transition:fade|global
         />
     {/if}
 {/if}

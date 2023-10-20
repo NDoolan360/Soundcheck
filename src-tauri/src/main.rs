@@ -91,8 +91,7 @@ fn main() {
             Ok(())
         })
         .on_window_event(|e| match e.event() {
-            | WindowEvent::Moved(_)
-            | WindowEvent::Resized(_) => {
+            WindowEvent::Moved(_) | WindowEvent::Resized(_) => {
                 let _ = e.window().app_handle().save_window_state(StateFlags::all());
             }
             _ => {}
