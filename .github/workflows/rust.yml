@@ -1,0 +1,48 @@
+on:
+    push:
+        paths:
+            - src-tauri/**
+
+name: Rust Clippy and Tests
+
+# Make sure CI fails on all warnings, including Clippy lints
+env:
+    RUSTFLAGS: '-Dwarnings'
+
+jobs:
+    rust_clippy_n_test:
+        strategy:
+            fail-fast: false
+            matrix:
+                platform: [macos-latest, ubuntu-latest, windows-latest]
+
+        runs-on: ${{ matrix.platform }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 18
+            - name: install Rust stable
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+            - name: Install dependencies (ubuntu only)
+              if: matrix.platform == 'ubuntu-latest'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+            - name: 'Create env file'
+              run: echo "${{ secrets.ENV_FILE }}" > .env
+
+            - name: 'Create build directory'
+              run: mkdir build
+
+            - name: Run Clippy
+              working-directory: ./src-tauri
+              run: cargo clippy --all-targets --all-features
+
+            - name: Run Tests
+              working-directory: ./src-tauri
+              run: cargo test --all-targets --all-features

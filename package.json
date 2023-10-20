@@ -8,8 +8,8 @@
         "tauri": "tauri",
         "vite:dev": "vite dev",
         "vite:build": "vite build",
-        "lint": "stylelint **/*.{css,svelte} && prettier --ignore-path .gitignore --check .",
-        "format": "stylelint **/*.{css,svelte} --fix && prettier --ignore-path .gitignore --write ."
+        "lint": "stylelint **/*.{css,svelte} --ignore-path .gitignore && prettier --ignore-path .gitignore --check .",
+        "format": "stylelint **/*.{css,svelte} --fix --ignore-path .gitignore && prettier --ignore-path .gitignore --write ."
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^2.4.6",
