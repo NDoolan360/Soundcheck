@@ -16,6 +16,7 @@ use rspotify::{scopes, AuthCodePkceSpotify, Config, Credentials, OAuth};
 use std::sync::Mutex;
 use tauri::{command, generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
+use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
 pub struct SpotifyState(Mutex<AuthCodePkceSpotify>);
 
@@ -77,6 +78,9 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("player").unwrap();
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
+            //
+            app.get_window("player")
+                .map(|window| window.restore_state(StateFlags::all()));
             // Set cache path location for rspotify cached token
             if let Some(spotify) = app.try_state::<SpotifyState>() {
                 let cache_path = tauri::api::path::app_data_dir(&app.config())
@@ -86,10 +90,12 @@ fn main() {
             }
             Ok(())
         })
-        .on_window_event(|e| {
-            if let WindowEvent::Resized(_) = e.event() {
-                std::thread::sleep(std::time::Duration::from_nanos(1));
+        .on_window_event(|e| match e.event() {
+            | WindowEvent::Moved(_)
+            | WindowEvent::Resized(_) => {
+                let _ = e.window().app_handle().save_window_state(StateFlags::all());
             }
+            _ => {}
         })
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_store::Builder::default().build())

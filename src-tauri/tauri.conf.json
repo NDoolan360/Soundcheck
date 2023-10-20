@@ -46,6 +46,8 @@
                 "label": "player",
                 "minHeight": 60,
                 "minWidth": 135,
+                "height": 140,
+                "width": 140,
                 "resizable": true,
                 "title": "Soundcheck"
             }
