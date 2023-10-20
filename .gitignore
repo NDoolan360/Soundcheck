@@ -30,3 +30,7 @@ build-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Tauri
+/src-tauri/target/
+/src-tauri/.spotify_token_cache.json

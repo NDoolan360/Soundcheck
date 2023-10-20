@@ -17,7 +17,18 @@ use std::sync::Mutex;
 use tauri::{command, generate_handler, Builder, Manager, WindowEvent};
 use tauri_plugin_log::LogTarget::{LogDir, Stdout, Webview};
 
-pub struct Spotify(Mutex<AuthCodePkceSpotify>);
+pub struct SpotifyState(Mutex<AuthCodePkceSpotify>);
+
+impl SpotifyState {
+    pub fn new(creds: Credentials, oauth: OAuth, config: Config) -> Self {
+        SpotifyState(Mutex::new(AuthCodePkceSpotify::with_config(
+            creds, oauth, config,
+        )))
+    }
+    pub fn get_spotify(&self) -> AuthCodePkceSpotify {
+        self.0.lock().unwrap().clone()
+    }
+}
 
 pub const SPOTIFY_REQUIRED_SCOPES: &str =
     "user-read-playback-state user-modify-playback-state user-library-read user-library-modify";
@@ -33,7 +44,7 @@ fn refresh_rate() -> Result<u32, String> {
 
 fn main() {
     Builder::default()
-        .manage(Spotify(Mutex::new(AuthCodePkceSpotify::with_config(
+        .manage(SpotifyState::new(
             Credentials::new_pkce(env!("SPOTIFY_CLIENT_ID")),
             OAuth {
                 redirect_uri: env!("SPOTIFY_REDIRECT_URI").into(),
@@ -44,7 +55,7 @@ fn main() {
                 token_cached: true,
                 ..Default::default()
             },
-        ))))
+        ))
         .invoke_handler(generate_handler![
             authenticate,
             check_liked,
@@ -67,11 +78,11 @@ fn main() {
             let window = app.get_window("player").unwrap();
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
             // Set cache path location for rspotify cached token
-            if let Some(state) = app.try_state::<Spotify>() {
-                state.0.lock().unwrap().config.cache_path =
-                    tauri::api::path::app_data_dir(&app.config())
-                        .expect("No cache directory found in app")
-                        .join(SPOTIFY_CACHE_FILENAME);
+            if let Some(spotify) = app.try_state::<SpotifyState>() {
+                let cache_path = tauri::api::path::app_data_dir(&app.config())
+                    .expect("No cache directory found in app")
+                    .join(SPOTIFY_CACHE_FILENAME);
+                spotify.get_spotify().config.cache_path = cache_path;
             }
             Ok(())
         })
