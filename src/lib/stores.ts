@@ -36,24 +36,24 @@ const currentItem = derived(state, ($s) => $s?.item);
 export const duration = derived(currentItem, ($i) => $i?.duration_ms ?? 0);
 export const trackId = derived(currentItem, ($i) => $i?.id);
 export const currentType = derived(state, ($s) => $s?.currently_playing_type);
-export const images = derived([currentItem, currentType, trackId], ([$currentItem, $currentType, _]) => {
+export const images = derived([currentItem, currentType, trackId], ([$currentItem, $currentType]) => {
     if ($currentType == 'episode') return ($currentItem as SpotifyApi.EpisodeObject).images;
     else if ($currentType == 'track') return ($currentItem as SpotifyApi.TrackObjectFull).album.images;
     else return [{ url: './ambient.gif', width: 361, height: 361 }];
 });
 
 export const title = derived(currentItem, ($i) => $i?.name ?? '');
-export const subheading = derived([currentItem, currentType, trackId], ([$currentItem, $currentType, _]) => {
+export const subheading = derived([currentItem, currentType, trackId], ([$currentItem, $currentType]) => {
     if ($currentType == 'episode') return ($currentItem as SpotifyApi.EpisodeObject)?.show?.name ?? '';
     else if ($currentType == 'track')
         return ($currentItem as SpotifyApi.TrackObjectFull)?.artists.map((a) => a.name).join(', ');
     else return '';
 });
 
-export let songLink = derived([currentType, trackId], ([$type, $trackId]) =>
+export const songLink = derived([currentType, trackId], ([$type, $trackId]) =>
     $type && $trackId ? `https://open.spotify.com/${$type}/${$trackId}` : undefined
 );
-export let deepLink = derived([currentType, trackId], ([$type, $trackId]) =>
+export const deepLink = derived([currentType, trackId], ([$type, $trackId]) =>
     $type && $trackId ? `spotify://${$type}/${$trackId}` : undefined
 );
 

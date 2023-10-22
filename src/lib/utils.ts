@@ -1,5 +1,5 @@
-import { Store } from 'tauri-plugin-store-api';
 import { asyncWritable } from '@square/svelte-store';
+import { Store } from 'tauri-plugin-store-api';
 
 export function optional<T>(): T | undefined {
     return undefined;
@@ -7,7 +7,7 @@ export function optional<T>(): T | undefined {
 
 export const clamp = (min: number, value: number, max: number) => Math.min(Math.max(min, value), max);
 
-const newEventsListener = (events: string[], listener: (...args: any) => void) => {
+const newEventsListener = (events: string[], listener: (_: Event) => void) => {
     events.forEach((event) => document.addEventListener(event, listener));
     return {
         destroy() {
@@ -16,13 +16,13 @@ const newEventsListener = (events: string[], listener: (...args: any) => void) =
     };
 };
 
-export const loseFocus = (node: HTMLElement, callback: Function) =>
-    newEventsListener(['mousedown', 'mouseleave', 'touchstart', 'focusin'], ({ target }: Event) => {
+export const loseFocus = (node: HTMLElement, callback: () => void) =>
+    newEventsListener(['mousedown', 'mouseleave', 'touchstart', 'focusin'], ({ target }) => {
         if (!node.contains(target as HTMLElement)) callback();
     });
 
-export const gainFocus = (node: HTMLElement, callback: Function) =>
-    newEventsListener(['mouseover', 'touchstart', 'focusin'], ({ target }: Event) => {
+export const gainFocus = (node: HTMLElement, callback: () => void) =>
+    newEventsListener(['mouseover', 'touchstart', 'focusin'], ({ target }) => {
         if (node.contains(target as HTMLElement)) callback();
     });
 
