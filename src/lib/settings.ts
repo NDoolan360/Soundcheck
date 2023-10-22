@@ -1,7 +1,7 @@
 import { newSettingStore } from './utils';
 
-export let darkMode = newSettingStore('darkMode', true);
-export let keepOnTop = newSettingStore('keepOnTop', true);
-export let interactiveOnHover = newSettingStore('interactiveOnHover', true);
-export let alwaysShowArtwork = newSettingStore('alwaysShowArtwork', false);
-export let artworkFillMode = newSettingStore('artworkFillMode', 'contain');
+export const darkMode = newSettingStore('darkMode', true);
+export const keepOnTop = newSettingStore('keepOnTop', true);
+export const interactiveOnHover = newSettingStore('interactiveOnHover', true);
+export const alwaysShowArtwork = newSettingStore('alwaysShowArtwork', false);
+export const artworkFillMode = newSettingStore('artworkFillMode', 'contain');
