@@ -6,8 +6,8 @@ on:
 name: Continuous Integration
 
 jobs:
-    cargo_fmt:
-        name: Cargo Format
+    clippy_fmt:
+        name: Cargo Format and Clippy
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -18,25 +18,8 @@ jobs:
                   profile: minimal
                   toolchain: stable
                   override: true
-                  components: rustfmt
-
-            - name: Run cargo fmt
-              working-directory: ./src-tauri
-              run: cargo fmt --all -- --check
-
-    clippy:
-        name: Cargo Clippy
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Install stable toolchain
-              uses: actions-rs/toolchain@v1
-              with:
-                  profile: minimal
-                  toolchain: stable
-                  override: true
-                  components: clippy
+                  components: clippy,rustfmt
+            - uses: Swatinem/rust-cache@v2
 
             - name: Prepare env and install dependencies
               run: |
@@ -45,9 +28,11 @@ jobs:
                   mkdir build
                   echo "${{ secrets.ENV_FILE }}" > .env
 
-            - name: Run cargo clippy
+            - name: Run cargo
               working-directory: ./src-tauri
-              run: cargo clippy --all-targets --all-features
+              run: |
+                  cargo fmt --all -- --check
+                  cargo clippy --all-targets --all-features
 
     eslint_prettier_stylelint:
         name: ESLint, Prettier and Stylelint
