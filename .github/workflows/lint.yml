@@ -1,0 +1,88 @@
+on:
+    push:
+        paths-ignore:
+            - src-tauri/**
+
+name: Lint
+
+env:
+    RUSTFLAGS: '-Dwarnings'
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Ignore tauri files
+              id: changed-non-tauri-files
+              uses: tj-actions/changed-files@v39
+              with:
+                  files_ignore: src-tauri/**
+
+            - name: Setup node
+              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 21
+
+            - name: Install frontend dependencies
+              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              run: npm install
+
+            - name: Cache node modules
+              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: node_modules-${{hashFiles('package.lock')}}
+                  restore-keys: node_modules-
+
+            - name: ESLint
+              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              run: npm run eslint:check
+
+    clippy_lint:
+        strategy:
+            fail-fast: false
+            matrix:
+                platform: [macos-latest, ubuntu-latest, windows-latest]
+
+        runs-on: ${{ matrix.platform }}
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Restrict checks to tauri files
+              id: changed-tauri-files
+              uses: tj-actions/changed-files@v39
+              with:
+                  files: src-tauri/**
+
+            - name: setup node
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 21
+            - name: install Rust stable
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+            - name: Install dependencies (ubuntu only)
+              if: matrix.platform == 'ubuntu-latest' && steps.changed-tauri-files.outputs.any_changed == 'true'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+            - name: 'Create env file'
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
+              run: echo "${{ secrets.ENV_FILE }}" > .env
+
+            - name: 'Create build directory'
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
+              run: mkdir build
+
+            - name: Run Clippy
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
+              working-directory: ./src-tauri
+              run: cargo clippy --all-targets --all-features
