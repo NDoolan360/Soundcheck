@@ -8,6 +8,5 @@
                 "ignorePseudoClasses": ["global"]
             }
         ]
-    },
-    "ignoreFiles": ["node_modules/*", "build/**", "*/material-symbols-outlined.css"]
+    }
 }
