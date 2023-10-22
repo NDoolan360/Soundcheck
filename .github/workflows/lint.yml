@@ -1,7 +1,4 @@
-on:
-    push:
-        paths-ignore:
-            - src-tauri/**
+on: push
 
 name: Lint
 
@@ -24,31 +21,29 @@ jobs:
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
               uses: actions/setup-node@v3
               with:
-                  node-version: 21
+                  node-version: 18
 
-            - name: Install frontend dependencies
-              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
-              run: npm install
-
-            - name: Cache node modules
+            - name: node_modules cache
+              id: node_module_cache
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
               uses: actions/cache@v3
               with:
                   path: node_modules
-                  key: node_modules-${{hashFiles('package.lock')}}
-                  restore-keys: node_modules-
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: node_modules
+
+            - name: Install frontend dependencies
+              if: |
+                  steps.node_module_cache.outputs.cache-hit != 'true' &&
+                  steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              run: npm install
 
             - name: ESLint
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
               run: npm run eslint:check
 
     clippy_lint:
-        strategy:
-            fail-fast: false
-            matrix:
-                platform: [macos-latest, ubuntu-latest, windows-latest]
-
-        runs-on: ${{ matrix.platform }}
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
 
@@ -62,14 +57,16 @@ jobs:
               if: steps.changed-tauri-files.outputs.any_changed == 'true'
               uses: actions/setup-node@v1
               with:
-                  node-version: 21
+                  node-version: 18
+
             - name: install Rust stable
               if: steps.changed-tauri-files.outputs.any_changed == 'true'
               uses: actions-rs/toolchain@v1
               with:
                   toolchain: stable
+
             - name: Install dependencies (ubuntu only)
-              if: matrix.platform == 'ubuntu-latest' && steps.changed-tauri-files.outputs.any_changed == 'true'
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               run: |
                   sudo apt-get update
                   sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf

@@ -1,7 +1,4 @@
-on:
-    push:
-        paths-ignore:
-            - src-tauri/**
+on: push
 
 name: Style
 
@@ -21,19 +18,22 @@ jobs:
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
               uses: actions/setup-node@v3
               with:
-                  node-version: 21
+                  node-version: 18
 
-            - name: Install frontend dependencies
-              if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
-              run: npm install
-
-            - name: Cache node modules
+            - name: node_modules cache
+              id: node_module_cache
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
               uses: actions/cache@v3
               with:
                   path: node_modules
-                  key: node_modules-${{hashFiles('package.lock')}}
-                  restore-keys: node_modules-
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: node_modules
+
+            - name: Install frontend dependencies
+              if: |
+                  steps.node_module_cache.outputs.cache-hit != 'true' &&
+                  steps.changed-non-tauri-files.outputs.any_changed == 'true'
+              run: npm install
 
             - name: Prettier
               if: steps.changed-non-tauri-files.outputs.any_changed == 'true'
