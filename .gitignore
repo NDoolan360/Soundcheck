@@ -1,35 +1,13 @@
-# Logs
 logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*.log*
 
+.vscode
 node_modules
-.env
-.env.*
-!.env.example
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-dist
-dist-ssr
 build
-build-ssr
-*.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Tauri
 /src-tauri/target/
 /src-tauri/.spotify_token_cache.json
+
+.env
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
