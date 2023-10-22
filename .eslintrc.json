@@ -1,0 +1,34 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:svelte/recommended",
+        "plugin:svelte/prettier"
+    ],
+    "ignorePatterns": ["vite.config.ts", "svelte.config.js"],
+    "overrides": [
+        {
+            "files": ["*.svelte"],
+            "parser": "svelte-eslint-parser",
+            "parserOptions": {
+                "parser": "@typescript-eslint/parser"
+            }
+        },
+        {
+            "files": ["*.ts", "*.svelte"],
+            "rules": {
+                "no-undef": "off"
+            }
+        }
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "extraFileExtensions": [".svelte"],
+        "project": "./tsconfig.json"
+    }
+}
