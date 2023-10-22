@@ -3,14 +3,13 @@ on:
         paths:
             - src-tauri/**
 
-name: Rust Clippy and Tests
+name: Tests
 
-# Make sure CI fails on all warnings, including Clippy lints
 env:
     RUSTFLAGS: '-Dwarnings'
 
 jobs:
-    rust_clippy_n_test:
+    run_rust_tests:
         strategy:
             fail-fast: false
             matrix:
@@ -19,30 +18,38 @@ jobs:
         runs-on: ${{ matrix.platform }}
         steps:
             - uses: actions/checkout@v3
+
+            - name: Restrict checks to tauri files
+              id: changed-tauri-files
+              uses: tj-actions/changed-files@v39
+              with:
+                  files: src-tauri/**
+
             - name: setup node
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               uses: actions/setup-node@v1
               with:
                   node-version: 18
             - name: install Rust stable
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               uses: actions-rs/toolchain@v1
               with:
                   toolchain: stable
             - name: Install dependencies (ubuntu only)
-              if: matrix.platform == 'ubuntu-latest'
+              if: matrix.platform == 'ubuntu-latest' && steps.changed-tauri-files.outputs.any_changed == 'true'
               run: |
                   sudo apt-get update
                   sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
             - name: 'Create env file'
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               run: echo "${{ secrets.ENV_FILE }}" > .env
 
             - name: 'Create build directory'
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               run: mkdir build
 
-            - name: Run Clippy
-              working-directory: ./src-tauri
-              run: cargo clippy --all-targets --all-features
-
             - name: Run Tests
+              if: steps.changed-tauri-files.outputs.any_changed == 'true'
               working-directory: ./src-tauri
               run: cargo test --all-targets --all-features

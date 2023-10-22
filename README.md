@@ -6,7 +6,7 @@
 
 ![Windows Support](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white) ![Ubuntu Support](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)<!-- ![Arch Linux Support](https://img.shields.io/badge/Arch_Linux-1793D1?style=for-the-badge&logo=arch-linux&logoColor=white) ![MacOS Support](https://img.shields.io/badge/MACOS-adb8c5?style=for-the-badge&logo=macos&logoColor=white) -->
 
-![GitHub issues](https://img.shields.io/github/issues/ndoolan360/soundcheck) ![GitHub pull requests](https://img.shields.io/github/issues-pr/ndoolan360/soundcheck) ![Rust workflow](https://github.com/ndoolan360/soundcheck/actions/workflows/rust.yml/badge.svg) ![Rust workflow](https://github.com/ndoolan360/soundcheck/actions/workflows/npm.yml/badge.svg)
+![GitHub issues](https://img.shields.io/github/issues/ndoolan360/soundcheck) ![GitHub pull requests](https://img.shields.io/github/issues-pr/ndoolan360/soundcheck) ![Test workflow](https://github.com/ndoolan360/soundcheck/actions/workflows/test.yml/badge.svg) ![Lint workflow](https://github.com/ndoolan360/soundcheck/actions/workflows/lint.yml/badge.svg) ![Style workflow](https://github.com/ndoolan360/soundcheck/actions/workflows/style.yml/badge.svg)
 
 </div>
 
