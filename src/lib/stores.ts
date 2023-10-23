@@ -1,5 +1,6 @@
 import { asyncDerived, asyncWritable, derived } from '@square/svelte-store';
 import { invoke, window } from '@tauri-apps/api';
+import ambient from '/ambient.gif?url';
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = 'track' | 'context' | 'off';
@@ -39,7 +40,7 @@ export const currentType = derived(state, ($s) => $s?.currently_playing_type);
 export const images = derived([currentItem, currentType, trackId], ([$currentItem, $currentType]) => {
     if ($currentType == 'episode') return ($currentItem as SpotifyApi.EpisodeObject).images;
     else if ($currentType == 'track') return ($currentItem as SpotifyApi.TrackObjectFull).album.images;
-    else return [{ url: './ambient.gif', width: 361, height: 361 }];
+    else return [{ url: ambient, width: 361, height: 361 }];
 });
 
 export const title = derived(currentItem, ($i) => $i?.name ?? '');
