@@ -93,18 +93,16 @@
 </script>
 
 {#if (screenInactive && $interactiveOnHover) || $alwaysShowArtwork}
-    {#if $artworkFillMode != 'cover' || $images.at(-1)?.url === './ambient.gif'}
+    {#if $artworkFillMode === 'contain'}
         <div id="lowres-image" style:background-image="url({$images.at(-1)?.url})" transition:fade|global />
     {/if}
-    {#if $images.at(-1)?.url != './ambient.gif'}
-        <img
-            id="track-image"
-            alt="Track Art"
-            src={$images.at(0)?.url}
-            style:object-fit={$artworkFillMode}
-            transition:fade|global
-        />
-    {/if}
+    <img
+        id="track-image"
+        alt="Track Art"
+        src={$images.at(0)?.url}
+        style:object-fit={$artworkFillMode}
+        transition:fade|global
+    />
 {/if}
 {#if !screenInactive || !$interactiveOnHover}
     <div id="vignette" transition:fade />
