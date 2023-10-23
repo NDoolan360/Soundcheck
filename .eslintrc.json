@@ -10,7 +10,7 @@
         "plugin:svelte/recommended",
         "plugin:svelte/prettier"
     ],
-    "ignorePatterns": ["vite.config.ts", "svelte.config.js"],
+    "ignorePatterns": ["svelte.config.js"],
     "overrides": [
         {
             "files": ["*.svelte"],
