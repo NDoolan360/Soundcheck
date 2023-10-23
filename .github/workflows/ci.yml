@@ -12,27 +12,31 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - name: Install stable toolchain
+            - name: Rust cache
+              uses: Swatinem/rust-cache@v2
+
+            - name: Prepare env and install Tauri dependencies
+              run: |
+                  mkdir build
+                  echo "${{ secrets.ENV_FILE }}" > .env
+                  sudo apt-get update
+                  sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+            - name: Install minimal Rust stable
               uses: actions-rs/toolchain@v1
               with:
                   profile: minimal
                   toolchain: stable
                   override: true
                   components: clippy,rustfmt
-            - uses: Swatinem/rust-cache@v2
 
-            - name: Prepare env and install dependencies
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-                  mkdir build
-                  echo "${{ secrets.ENV_FILE }}" > .env
-
-            - name: Run cargo
+            - name: Cargo fmt
               working-directory: ./src-tauri
-              run: |
-                  cargo fmt --all -- --check
-                  cargo clippy --all-targets --all-features
+              run: cargo fmt --all -- --check
+
+            - name: Cargo clippy
+              working-directory: ./src-tauri
+              run: cargo clippy --all-targets --all-features
 
     eslint_prettier_stylelint:
         name: ESLint, Prettier and Stylelint
@@ -43,7 +47,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v3
               with:
-                  node-version: 18
+                  node-version: 21
 
             - name: Check node_modules cache
               id: node_module_cache
@@ -65,3 +69,59 @@ jobs:
 
             - name: Run Stylelint
               run: npm run stylelint:check
+
+    tests:
+        name: Cargo Test and Vitest
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Rust cache
+              uses: Swatinem/rust-cache@v2
+
+            - name: Prepare env and install Tauri dependencies
+              run: |
+                  mkdir build
+                  echo "${{ secrets.ENV_FILE }}" > .env
+                  sudo apt-get update
+                  sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev libwebkit2gtk-4.0-dev webkit2gtk-driver xvfb
+
+            - name: Install Rust stable
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+
+            - name: Cargo test
+              working-directory: ./src-tauri
+              run: cargo test --all-targets --all-features
+
+            - name: Cargo build
+              working-directory: ./src-tauri
+              run: cargo build --release
+
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 21
+
+            - name: Check node_modules cache
+              id: node_module_cache
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: node_modules
+
+            - name: Npm install
+              if: steps.node_module_cache.outputs.cache-hit != 'true'
+              run: npm install
+
+            # [`tauri-driver`]: https://crates.io/crates/tauri-driver
+            - name: Install tauri-driver
+              working-directory: ./src-tauri
+              run: cargo install tauri-driver
+
+            # [webdriverio]: https://webdriver.io/
+            - name: WebdriverIO
+              run: xvfb-run npm run test
+              working-directory: webdriver/webdriverio
