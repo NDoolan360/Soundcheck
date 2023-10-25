@@ -12,7 +12,7 @@
         "svelte:check": "svelte-check --tsconfig ./tsconfig.json",
         "stylelint:check": "stylelint --ignore-path .gitignore **/*.{css,svelte}",
         "stylelint": "stylelint --fix --ignore-path .gitignore **/*.{css,svelte}",
-        "prettier:check": "prettier --ignore-path .gitignore **/*.{css,html,ts,svelte}",
+        "prettier:check": "prettier --check --ignore-path .gitignore **/*.{css,html,ts,svelte}",
         "prettier": "prettier --write --ignore-path .gitignore **/*.{css,html,ts,svelte}",
         "eslint:check": "eslint --ignore-path .gitignore **/*.{ts,svelte}",
         "eslint": "eslint --fix --ignore-path .gitignore **/*.{ts,svelte}"

@@ -10,7 +10,6 @@
         "plugin:svelte/recommended",
         "plugin:svelte/prettier"
     ],
-    "ignorePatterns": ["svelte.config.js"],
     "overrides": [
         {
             "files": ["*.svelte"],
@@ -20,7 +19,7 @@
             }
         },
         {
-            "files": ["*.ts", "*.svelte"],
+            "files": ["*.svelte"],
             "rules": {
                 "no-undef": "off"
             }
@@ -29,6 +28,6 @@
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "extraFileExtensions": [".svelte"],
-        "project": "./tsconfig.json"
+        "tsconfigRootDir": "./tsconfig.json"
     }
 }
