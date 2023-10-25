@@ -8,7 +8,7 @@
         "allowJs": true,
         "checkJs": true,
         "isolatedModules": true,
-        "types": ["node", "spotify-api"]
+        "types": ["node", "spotify-api", "vitest/globals"]
     },
     "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"],
     "references": [{ "path": "./tsconfig.node.json" }]
