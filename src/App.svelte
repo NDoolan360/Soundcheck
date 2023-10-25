@@ -5,7 +5,7 @@
     import { get } from 'svelte/store';
     import { fade, slide } from 'svelte/transition';
     import ProgressBar from './lib/components/ProgressBar.svelte';
-    import { alwaysShowArtwork, artworkFillMode, darkMode, interactiveOnHover, keepOnTop } from './lib/settings';
+    import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from './lib/settings';
     import Button from './lib/sm3lte/Button.svelte';
     import { updateStyleSheet } from './lib/sm3lte/MaterialThemeController';
     import ProgressIndicator from './lib/sm3lte/ProgressIndicator.svelte';
@@ -48,19 +48,20 @@
         reload(state, delay, () => (stateLoading = false));
     };
 
+    export let screenActive = false;
+
     let mainWidth: number;
     let mainHeight: number;
-    let screenInactive = true;
     let menuOpen = false;
     let stateLoading = false;
     let triggerCopiedSnackbar: () => void;
 
-    gainFocus(document.body, () => (screenInactive = false));
-    loseFocus(document.body, () => (screenInactive = true));
+    gainFocus(document.body, () => (screenActive = true));
+    loseFocus(document.body, () => (screenActive = false));
 
     onMount(() => {
-        let autoReloadState: number;
-        let autoReloadDevices: number;
+        let autoReloadState: NodeJS.Timeout;
+        let autoReloadDevices: NodeJS.Timeout;
         invoke<number>('refresh_rate', {}).then((refresh_rate) => {
             autoReloadState = setInterval(reload, refresh_rate, state);
             autoReloadDevices = setInterval(reload, refresh_rate * 3, devices);
@@ -92,7 +93,7 @@
     $: window.appWindow.setAlwaysOnTop($keepOnTop);
 </script>
 
-{#if (screenInactive && $interactiveOnHover) || $alwaysShowArtwork}
+{#if !(screenActive || $alwaysShowControls) || $alwaysShowArtwork}
     {#if $artworkFillMode === 'contain'}
         <div id="lowres-image" style:background-image="url({$images.at(-1)?.url})" transition:fade|global />
     {/if}
@@ -104,7 +105,7 @@
         transition:fade|global
     />
 {/if}
-{#if !screenInactive || !$interactiveOnHover}
+{#if screenActive || $alwaysShowControls}
     <div id="vignette" transition:fade />
     <main data-tauri-drag-region bind:clientWidth={mainWidth} bind:clientHeight={mainHeight} transition:fade>
         {#if mainHeight > 70}
@@ -179,8 +180,8 @@
                             </Switch>
                         </span>
                         <span>
-                            <label for="interactive-on-hover">Interactive Only On Hover:</label>
-                            <Switch label="interactive-on-hover" bind:checked={$interactiveOnHover}>
+                            <label for="always-show-controls">Always Show Controls:</label>
+                            <Switch label="always-show-controls" bind:checked={$alwaysShowControls}>
                                 <i slot="switch-unchecked-icon" class="material-symbols-outlined"> do_not_touch </i>
                                 <i slot="switch-checked-icon" class="material-symbols-outlined"> hand_gesture </i>
                             </Switch>

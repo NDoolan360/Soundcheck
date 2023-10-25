@@ -1,6 +1,8 @@
 import { asyncWritable } from '@square/svelte-store';
 import { Store } from 'tauri-plugin-store-api';
 
+export const testingMode = typeof process !== 'undefined' && process.env['MODE'] === 'test';
+
 export function optional<T>(): T | undefined {
     return undefined;
 }
