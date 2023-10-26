@@ -12,5 +12,8 @@ export default defineConfig({
             },
         },
         experimentalVmThreads: true,
+        coverage: {
+            exclude: ['**/test.data.ts'],
+        },
     },
 });
