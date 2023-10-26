@@ -1,6 +1,7 @@
 import { asyncWritable } from '@square/svelte-store';
 import { Store } from 'tauri-plugin-store-api';
 
+const inBrowser = window.__TAURI_IPC__ === undefined;
 export const testingMode = typeof process !== 'undefined' && process.env['MODE'] === 'test';
 
 export function optional<T>(): T | undefined {
@@ -39,16 +40,18 @@ export const newSettingStore = <T>(key: string, initial: T) => {
     return asyncWritable<[], T>(
         [],
         async () => {
-            if (await store.has(key)) return (await store.get<T>(key))!;
-            else {
+            if (!inBrowser) {
+                if (await store.has(key)) return (await store.get<T>(key))!;
                 await store.set(key, initial);
                 store.save();
-                return initial;
             }
+            return initial;
         },
         async (value: T) => {
-            await store.set(key, value);
-            store.save();
+            if (!inBrowser) {
+                await store.set(key, value);
+                store.save();
+            }
             return value;
         },
         { initial }
