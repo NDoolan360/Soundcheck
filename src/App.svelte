@@ -482,7 +482,7 @@
         max-width: calc(100vw - 2.5rem);
         max-height: calc(100vh - 4rem);
         padding: 0.5rem;
-        border-radius: 0.5rem;
+        border-radius: 0.25rem;
         background-color: rgb(var(--sm3-scheme-color-surface-container));
         color: rgb(var(--sm3-scheme-color-on-surface));
         gap: 1rem;
@@ -491,6 +491,21 @@
 
         --sm3-comp-switch-size-height: 1.5rem;
         --sm3-comp-switch-size-width: 2.5rem;
+    }
+
+    #menu::-webkit-scrollbar {
+        width: 0.5rem;
+    }
+
+    #menu::-webkit-scrollbar-track {
+        background-color: rgb(var(--sm3-scheme-color-surface-container));
+        border-bottom-right-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+    }
+
+    #menu::-webkit-scrollbar-thumb {
+        border-radius: 0.25rem;
+        background-color: rgb(var(--sm3-scheme-color-on-surface-variant));
     }
 
     #info {
