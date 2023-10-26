@@ -12,8 +12,14 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - name: Rust cache
-              uses: Swatinem/rust-cache@v2
+            - name: Cache Crates
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.cargo
+                      ./src-tauri/target
+                  key: rust-dev-${{ hashFiles('./src-tauri/Cargo.lock') }}
+                  restore-keys: rust-dev-
 
             - name: Prepare env and install Tauri dependencies
               run: |
@@ -50,7 +56,6 @@ jobs:
                   node-version: 21
 
             - name: Check node_modules cache
-              id: node_module_cache
               uses: actions/cache@v3
               with:
                   path: node_modules
@@ -58,7 +63,6 @@ jobs:
                   restore-keys: node_modules
 
             - name: Install frontend dependencies
-              if: steps.node_module_cache.outputs.cache-hit != 'true'
               run: npm install
 
             - name: Run ESLint
@@ -76,8 +80,21 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - name: Rust cache
-              uses: Swatinem/rust-cache@v2
+            - name: Cache Crates
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.cargo
+                      ./src-tauri/target
+                  key: rust-dev-${{ hashFiles('./src-tauri/Cargo.lock') }}
+                  restore-keys: rust-dev-
+
+            - name: Cache node_modules
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: node_modules-${{hashFiles('package-lock.json')}}
+                  restore-keys: node_modules
 
             - name: Prepare env and install Tauri dependencies
               run: |
@@ -103,16 +120,7 @@ jobs:
               with:
                   node-version: 21
 
-            - name: Check node_modules cache
-              id: node_module_cache
-              uses: actions/cache@v3
-              with:
-                  path: node_modules
-                  key: node_modules-${{hashFiles('package-lock.json')}}
-                  restore-keys: node_modules
-
             - name: Npm install
-              if: steps.node_module_cache.outputs.cache-hit != 'true'
               run: npm install
 
             - name: Run Vitest
