@@ -26,12 +26,6 @@ export const devices = asyncDerived(
     async ($auth) => (!$auth ? [] : await invoke<SpotifyApi.UserDevice[]>('get_device_list')),
     { reloadable: true, initial: [] }
 );
-export const activeDevice = asyncWritable(
-    state,
-    async ($state) => $state?.device?.id ?? null,
-    async (newDeviceId) => invoke('set_device', { deviceId: newDeviceId }),
-    { reloadable: true }
-);
 
 const currentItem = derived(state, ($s) => $s?.item);
 export const duration = derived(currentItem, ($i) => $i?.duration_ms ?? 0);
@@ -45,7 +39,7 @@ export const images = derived([currentItem, currentType, trackId], ([$currentIte
 
 export const title = derived(currentItem, ($i) => $i?.name ?? '');
 export const subheading = derived([currentItem, currentType, trackId], ([$currentItem, $currentType]) => {
-    if ($currentType == 'episode') return ($currentItem as SpotifyApi.EpisodeObject)?.show?.name ?? '';
+    if ($currentType == 'episode') return ($currentItem as SpotifyApi.EpisodeObject)?.show?.name;
     else if ($currentType == 'track')
         return ($currentItem as SpotifyApi.TrackObjectFull)?.artists.map((a) => a.name).join(', ');
     else return '';
@@ -58,15 +52,24 @@ export const deepLink = derived([currentType, trackId], ([$type, $trackId]) =>
     $type && $trackId ? `spotify://${$type}/${$trackId}` : undefined
 );
 
+export const activeDevice = asyncWritable(
+    state,
+    async ($state) => $state?.device?.id ?? null,
+    async (newDeviceId) => invoke('set_device', { deviceId: newDeviceId }),
+    { reloadable: true, initial: null }
+);
+
 export const progress = asyncWritable(
     state,
     async ($state) => $state?.progress_ms ?? 0,
-    async (newProgress) => invoke<void>('seek', { progress: newProgress })
+    async (newProgress) => invoke<void>('seek', { progress: newProgress }),
+    { initial: 0 }
 );
 export const playing = asyncWritable(
     state,
     async ($state) => $state?.is_playing ?? false,
-    async (newPlayState) => invoke<void>('set_playing', { playState: newPlayState })
+    async (newPlayState) => invoke<void>('set_playing', { playState: newPlayState }),
+    { initial: false }
 );
 export const shuffle = asyncWritable(
     state,
@@ -78,7 +81,7 @@ export const repeat = asyncWritable(
     state,
     async ($state) => ($state?.repeat_state ?? 'off') as RepeatState,
     async (newRepeatState) => invoke<void>('set_repeat', { repeatState: newRepeatState }),
-    { initial: 'off' }
+    { initial: 'off' as RepeatState }
 );
 export const liked = asyncWritable(
     trackId,
@@ -91,13 +94,12 @@ export const liked = asyncWritable(
 export const volume = asyncWritable(
     state,
     async ($state) => $state?.device?.volume_percent ?? 0,
-    async (newVolumePercent) => invoke<void>('set_volume', { volumePercent: newVolumePercent })
+    async (newVolumePercent) => invoke<void>('set_volume', { volumePercent: newVolumePercent }),
+    { initial: 0 }
 );
 
 export const disallows = derived(state, ($state) => {
-    const disallowArray = ($state?.actions?.disallows as string[]) ?? {
-        includes: (action: string) => action != 'transferring_playback',
-    };
+    const disallowArray = ($state?.actions?.disallows as string[]) ?? { includes: () => true };
     return {
         playPause: $state?.is_playing ? disallowArray.includes('pausing') : disallowArray.includes('resuming'),
         seeking: disallowArray.includes('seeking'),
