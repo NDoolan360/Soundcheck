@@ -31,7 +31,7 @@ export const gainFocus = (node: HTMLElement, callback: () => void) =>
 
 // Util for converting raw times to pretty times
 export const prettyTime = (rawTime: number) => {
-    const date = new Date(rawTime ?? 0);
+    const date = new Date(rawTime);
     return date.getUTCHours() > 0 ? date.toISOString().substring(11, 19) : date.toISOString().substring(14, 19);
 };
 
@@ -40,7 +40,8 @@ export const newSettingStore = <T>(key: string, initial: T) => {
     return asyncWritable<[], T>(
         [],
         async () => {
-                        if (!inBrowser) {
+            /* c8 ignore next 5 */
+            if (!inBrowser) {
                 if (await store.has(key)) return (await store.get<T>(key))!;
                 await store.set(key, initial);
                 store.save();
@@ -48,7 +49,8 @@ export const newSettingStore = <T>(key: string, initial: T) => {
             return initial;
         },
         async (value: T) => {
-                        if (!inBrowser) {
+            /* c8 ignore next 4 */
+            if (!inBrowser) {
                 await store.set(key, value);
                 store.save();
             }
