@@ -40,7 +40,7 @@ export const newSettingStore = <T>(key: string, initial: T) => {
     return asyncWritable<[], T>(
         [],
         async () => {
-            if (!inBrowser) {
+                        if (!inBrowser) {
                 if (await store.has(key)) return (await store.get<T>(key))!;
                 await store.set(key, initial);
                 store.save();
@@ -48,7 +48,7 @@ export const newSettingStore = <T>(key: string, initial: T) => {
             return initial;
         },
         async (value: T) => {
-            if (!inBrowser) {
+                        if (!inBrowser) {
                 await store.set(key, value);
                 store.save();
             }
@@ -57,3 +57,5 @@ export const newSettingStore = <T>(key: string, initial: T) => {
         { initial }
     );
 };
+
+export const cloneObject = (obj: unknown) => JSON.parse(JSON.stringify(obj));
