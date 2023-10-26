@@ -1,6 +1,6 @@
 <script lang="ts">
     import { isReloadable, type Loadable } from '@square/svelte-store';
-    import { clipboard, invoke, window } from '@tauri-apps/api';
+    import { clipboard, invoke, window as tauriWindow } from '@tauri-apps/api';
     import { onMount } from 'svelte';
     import { get } from 'svelte/store';
     import { fade, slide } from 'svelte/transition';
@@ -36,10 +36,10 @@
     import { clamp, gainFocus, loseFocus } from './lib/utils';
 
     const repeatMap = {
-        off: 'context',
-        context: 'track',
-        track: 'off',
-    } as { [name: string]: RepeatState };
+            off: 'context',
+            context: 'track',
+            track: 'off',
+        } as { [name: string]: RepeatState };
     const reload = <T,>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
         setTimeout(() => isReloadable(loadbale) && loadbale.reload().then(cb), delay);
     };
@@ -60,6 +60,10 @@
     loseFocus(document.body, () => (screenActive = false));
 
     onMount(() => {
+        const unsubKeepOnTop = keepOnTop.subscribe((value) => {
+            tauriWindow.appWindow.setAlwaysOnTop(value);
+        });
+
         let autoReloadState: NodeJS.Timeout;
         let autoReloadDevices: NodeJS.Timeout;
         invoke<number>('refresh_rate', {}).then((refresh_rate) => {
@@ -75,7 +79,10 @@
             1000,
             990
         );
-        return () => [autoReloadState, autoReloadDevices, optimiticProgressUpdate].forEach(clearInterval);
+        return () => {
+            [autoReloadState, autoReloadDevices, optimiticProgressUpdate].forEach(clearInterval);
+            unsubKeepOnTop();
+        };
     });
 
     $: {
@@ -84,13 +91,13 @@
         fetch(image.url)
             .then((response) => response.blob())
             .then((blob) => {
+                if (!blob) return;
                 let img = new Image(image.width, image.height);
                 img.src = URL.createObjectURL(blob);
                 updateStyleSheet(img, $darkMode);
             });
     }
     $: displayedProgress = $progress;
-    $: window.appWindow.setAlwaysOnTop($keepOnTop);
 </script>
 
 {#if !(screenActive || $alwaysShowControls) || $alwaysShowArtwork}
@@ -209,8 +216,8 @@
             <Button
                 id="close-button"
                 on:click={() => {
-                    window.WebviewWindow.getByLabel('player')?.close();
-                    window.WebviewWindow.getByLabel('auth')?.close();
+                    tauriWindow.WebviewWindow.getByLabel('player')?.close();
+                    tauriWindow.WebviewWindow.getByLabel('auth')?.close();
                 }}
             >
                 <i slot="button-icon" class="material-symbols-outlined"> close </i>
