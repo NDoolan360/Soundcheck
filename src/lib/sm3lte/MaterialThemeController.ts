@@ -17,7 +17,6 @@ import {
 } from '@material/material-color-utilities';
 
 type Rgb = `${number} ${number} ${number}`;
-type SerializedScheme = { [name: string]: Rgb };
 export type ColorSource = string | DynamicScheme | number | HTMLImageElement;
 export type SchemeType =
     | typeof SchemeMonochrome
@@ -39,25 +38,22 @@ const schemeTypes: { [name: string]: SchemeType } = {
     content: SchemeContent,
 };
 
-const colorToRgb = (color: DynamicColor, scheme: DynamicScheme): Rgb => {
+export const colorToRgb = (color: DynamicColor, scheme: DynamicScheme): Rgb => {
     const argb = color.getArgb(scheme);
     const rgba = rgbaFromArgb(argb);
     return `${rgba.r} ${rgba.g} ${rgba.b}`;
 };
 
-const serializeDynamicScheme = (scheme: DynamicScheme): SerializedScheme => {
-    const colorNames = Object.entries(MaterialDynamicColors)
-        .filter((entry) => entry[1] instanceof DynamicColor)
-        .map(([key]) => key as keyof MaterialDynamicColors);
-    return Object.fromEntries(colorNames.map((name) => [name, colorToRgb(MaterialDynamicColors[name], scheme)]));
-};
-
-const toKebabCase = (name: string) =>
+export const toKebabCase = (name: string) =>
     name.replace(/[A-Z]+(?![a-z])|[A-Z]/g, ($1, $2) => ($2 ? '-' : '') + $1).toLowerCase();
 
-const serializedSchemetoCss = (scheme: SerializedScheme, prefix: string): string =>
-    Object.entries(scheme)
-        .map(([name, rgb]) => `--${prefix}-color-${toKebabCase(name)}: ${rgb};`)
+export const dynamicSchemeToCss = (scheme: DynamicScheme, prefix: string): string =>
+    Object.entries(MaterialDynamicColors)
+        .filter((entry) => entry[1] instanceof DynamicColor)
+        .map(([key]) => {
+            const name = key as keyof MaterialDynamicColors;
+            return `--${prefix}-color-${toKebabCase(name)}: ${colorToRgb(MaterialDynamicColors[name], scheme)};`;
+        })
         .join(' ');
 
 export const updateStyleSheet = async (
@@ -68,24 +64,25 @@ export const updateStyleSheet = async (
     cssPrefix = 'sm3-scheme'
 ) => {
     let dynamicScheme;
+    let argbSource;
     if (source instanceof DynamicScheme) dynamicScheme = source;
-    else {
-        let argbSource;
-        if (typeof source === 'number') argbSource = source;
-        else if (typeof source === 'string') argbSource = argbFromHex(source);
-        else if (source instanceof HTMLImageElement) argbSource = await sourceColorFromImage(source);
-        else return;
+    else if (typeof source === 'number') argbSource = source;
+    else if (typeof source === 'string') argbSource = argbFromHex(source);
+    else if (source instanceof HTMLImageElement) argbSource = await sourceColorFromImage(source);
+
+    if (argbSource) {
         source = hexFromArgb(argbSource);
         const scheme = schemeTypes[schemeType] ?? SchemeContent;
         dynamicScheme = new scheme(Hct.fromInt(argbSource), darkMode, contrast);
     }
-    // Convert scheme to css and load into adopted stylesheets
-    const styleSheet = new CSSStyleSheet();
-    styleSheet.replaceSync(`
-		:root {
-			color-scheme: ${darkMode ? 'dark' : 'light'};
-			${serializedSchemetoCss(serializeDynamicScheme(dynamicScheme), cssPrefix)}
-		}`);
-    document.adoptedStyleSheets = [styleSheet];
-    return source;
+
+    if (dynamicScheme) {
+        // Convert scheme to css and load into adopted stylesheets
+        const styleSheet = new CSSStyleSheet();
+        styleSheet.insertRule(`:root {
+            color-scheme: ${darkMode ? 'dark' : 'light'};
+            ${dynamicSchemeToCss(dynamicScheme, cssPrefix)}
+        }`);
+        document.adoptedStyleSheets = [styleSheet];
+    }
 };
