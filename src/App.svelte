@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { isReloadable, type Loadable } from '@square/svelte-store';
+    import { isReloadable, type Loadable, type Writable } from '@square/svelte-store';
     import { clipboard, invoke, window as tauriWindow } from '@tauri-apps/api';
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
+    import { get, writable } from 'svelte/store';
     import { fade, slide } from 'svelte/transition';
     import ProgressBar from './lib/components/ProgressBar.svelte';
     import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from './lib/settings';
@@ -35,11 +35,15 @@
     } from './lib/stores';
     import { clamp, gainFocus, loseFocus } from './lib/utils';
 
-    const repeatMap = {
+    const nextRepeat = (curr: RepeatState) => () => {
+        const map = {
             off: 'context',
             context: 'track',
             track: 'off',
         } as { [name: string]: RepeatState };
+        curr = map[curr];
+    };
+
     const reload = <T,>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
         setTimeout(() => isReloadable(loadbale) && loadbale.reload().then(cb), delay);
     };
@@ -50,9 +54,12 @@
 
     export let screenActive = false;
 
+    let menu = writable(false);
+    const closeMenu = () => ($menu = false);
+    const toggle = (val: Writable<boolean>) => () => val.update((v) => !v);
+
     let mainWidth: number;
     let mainHeight: number;
-    let menuOpen = false;
     let stateLoading = false;
     let triggerCopiedSnackbar: () => void;
 
@@ -100,8 +107,8 @@
     $: displayedProgress = $progress;
 </script>
 
-{#if !(screenActive || $alwaysShowControls) || $alwaysShowArtwork}
-    {#if $artworkFillMode === 'contain'}
+{#if $alwaysShowArtwork || !(screenActive || $alwaysShowControls)}
+    {#if $artworkFillMode !== 'cover'}
         <div id="lowres-image" style:background-image="url({$images.at(-1)?.url})" transition:fade|global />
     {/if}
     <img
@@ -116,15 +123,15 @@
     <div id="vignette" transition:fade />
     <main data-tauri-drag-region bind:clientWidth={mainWidth} bind:clientHeight={mainHeight} transition:fade>
         {#if mainHeight > 70}
-            <section id="header" use:loseFocus={() => (menuOpen = false)}>
-                <Button id="spotify-logo" on:click={() => (menuOpen = !menuOpen)}>
+            <section id="menu-wrapper" use:loseFocus={closeMenu}>
+                <Button id="spotify-logo" on:click={toggle(menu)}>
                     <svg slot="button-icon" viewBox="0 0 512 512">
                         <path stroke-width={50} d="M95 173s170-49 317 33" />
                         <path stroke-width={42.5} d="M109 256s139-45 271 32m-186-17" />
                         <path stroke-width={33.3} d="M116 334s139-39 235 26" />
                     </svg>
                 </Button>
-                {#if menuOpen}
+                {#if $menu}
                     <div id="menu" transition:slide>
                         <span>
                             <label for="volume">Volume:</label>
@@ -141,7 +148,7 @@
                             <select
                                 id="device-list"
                                 bind:value={$activeDevice}
-                                disabled={$devices.length == 0 || $disallows.transferringPlayback}
+                                disabled={$disallows.transferringPlayback}
                             >
                                 <option hidden disabled selected value={null}> None </option>
                                 {#each $devices as device (device.id)}
@@ -154,10 +161,7 @@
                             </select>
                         </span>
                         <hr />
-                        <Button
-                            id={$authenticated ? 'logout' : 'login'}
-                            on:click={() => ($authenticated = !$authenticated)}
-                        >
+                        <Button id={$authenticated ? 'logout' : 'login'} on:click={toggle(authenticated)}>
                             {$authenticated ? 'Log Out' : 'Log In'}
                         </Button>
                         <Button
@@ -194,8 +198,8 @@
                             </Switch>
                         </span>
                         <span>
-                            <label for="enforce-art">Always Show Artwork:</label>
-                            <Switch label="enforce-art" bind:checked={$alwaysShowArtwork}>
+                            <label for="always-show-art">Always Show Artwork:</label>
+                            <Switch label="always-show-art" bind:checked={$alwaysShowArtwork}>
                                 <i slot="switch-unchecked-icon" class="material-symbols-outlined"> hide_image </i>
                                 <i slot="switch-checked-icon" class="material-symbols-outlined"> image </i>
                             </Switch>
@@ -236,7 +240,7 @@
                             FAB
                             selected
                             radius={!$playing ? '50%' : undefined}
-                            on:click={() => ($playing = !$playing)}
+                            on:click={toggle(playing)}
                             disabled={$disallows.playPause}
                         >
                             <i slot="button-icon" class="material-symbols-outlined">
@@ -278,12 +282,7 @@
             {/if}
             {#if !(mainWidth > 200 && mainHeight > 125)}
                 <span in:fade>
-                    <Button
-                        id="play-pause"
-                        type="standard"
-                        on:click={() => ($playing = !$playing)}
-                        disabled={$disallows.playPause}
-                    >
+                    <Button id="play-pause" type="standard" on:click={toggle(playing)} disabled={$disallows.playPause}>
                         <i slot="button-icon" class="material-symbols-outlined">
                             {#if stateLoading}
                                 <ProgressIndicator label="loading-state" circular indeterminate />
@@ -323,7 +322,7 @@
                         <Button
                             id="favorite"
                             selected={$liked}
-                            on:click={() => ($liked = !$liked)}
+                            on:click={toggle(liked)}
                             disabled={$disallows.togglingLike}
                         >
                             <i slot="button-icon" class="material-symbols-outlined"> favorite </i>
@@ -335,7 +334,7 @@
                         <Button
                             id="shuffle"
                             selected={$shuffle}
-                            on:click={() => ($shuffle = !$shuffle)}
+                            on:click={toggle(shuffle)}
                             disabled={$disallows.togglingShuffle}
                         >
                             <i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
@@ -347,7 +346,7 @@
                         <Button
                             id="repeat"
                             selected={$repeat != 'off'}
-                            on:click={() => ($repeat = repeatMap[$repeat])}
+                            on:click={nextRepeat($repeat)}
                             disabled={$disallows.togglingRepeat}
                         >
                             <i slot="button-icon" class="material-symbols-outlined">
@@ -485,7 +484,7 @@
         padding: 0.5rem;
         border-radius: 0.5rem;
         background-color: rgb(var(--sm3-scheme-color-surface-container));
-        color: rgb(var(--sm3-scheme-color-on-surface-container));
+        color: rgb(var(--sm3-scheme-color-on-surface));
         gap: 1rem;
         overflow-y: auto;
         pointer-events: auto;
