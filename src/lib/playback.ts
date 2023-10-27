@@ -1,4 +1,4 @@
-import { asyncDerived, asyncWritable, derived } from '@square/svelte-store';
+import { asyncDerived, asyncWritable, derived, writable } from '@square/svelte-store';
 import { invoke, window } from '@tauri-apps/api';
 import ambient from '/ambient.gif?url';
 
@@ -15,9 +15,17 @@ export const authenticated = asyncWritable(
     { reloadable: true, initial: false }
 );
 
+export const loading = writable(false);
+
 export const state = asyncDerived(
     authenticated,
-    async ($auth) => ($auth ? await invoke<State>('get_playback_state') : null),
+    async ($auth) => {
+        if ($auth) {
+            loading.set(false);
+            return await invoke<State>('get_playback_state');
+        }
+        return null;
+    },
     { reloadable: true, initial: null }
 );
 

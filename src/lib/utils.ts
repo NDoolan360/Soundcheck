@@ -1,5 +1,6 @@
-import { asyncWritable } from '@square/svelte-store';
+import { asyncWritable, type Writable } from '@square/svelte-store';
 import { Store } from 'tauri-plugin-store-api';
+import type { RepeatState } from './playback';
 
 const inBrowser = window.__TAURI_IPC__ === undefined;
 export const testingMode = typeof process !== 'undefined' && process.env['MODE'] === 'test';
@@ -61,3 +62,14 @@ export const newSettingStore = <T>(key: string, initial: T) => {
 };
 
 export const cloneObject = (obj: unknown) => JSON.parse(JSON.stringify(obj));
+
+export const toggle = (val: Writable<boolean>) => () => val.update((v) => !v);
+
+export const nextRepeat = (curr: Writable<RepeatState>) => () => {
+    const map = {
+        off: 'context',
+        context: 'track',
+        track: 'off',
+    } as { [name: string]: RepeatState };
+    curr.update((val) => map[val]);
+};
