@@ -21,7 +21,7 @@ import {
     volume,
     type RepeatState,
     disallows,
-} from '../stores';
+} from '../playback';
 import {
     MOCK_AUTH_DISALLOWS,
     MOCK_DEVICE_LIST,
