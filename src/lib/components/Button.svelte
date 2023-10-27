@@ -24,7 +24,7 @@
     style:--comp-button-size-radius={radius}
     style:--comp-button-color-text={color}
     style:--comp-button-color-background={backgroundColor}
-    class:FAB
+    class:fab={FAB}
     class:filled
     class:icon={$$slots['button-icon']}
     class:selected={selected === true}
@@ -45,7 +45,7 @@
         transition: 0.4s;
     }
 
-    button:not(.selected, .FAB) :global([slot='button-icon'].material-symbols-outlined) {
+    button:not(.selected, .fab) :global([slot='button-icon'].material-symbols-outlined) {
         font-variation-settings: 'FILL' 0;
     }
 
@@ -115,7 +115,7 @@
         --_elevation: 1px;
     }
 
-    .FAB {
+    .fab {
         border-radius: 50%;
         transition: border-radius 0.4s;
 
@@ -123,7 +123,7 @@
         --_height: 56px;
     }
 
-    .FAB.selected {
+    .fab.selected {
         border-radius: var(--corner-large);
     }
 
@@ -131,7 +131,7 @@
         --_padding: 0;
     }
 
-    .icon.filled:not(.selected, .FAB) {
+    .icon.filled:not(.selected, .fab) {
         --_text-color: var(--scheme-color-primary);
         --_background-color: var(--scheme-color-surface-container-highest);
     }

@@ -135,7 +135,8 @@
                     <div
                         id="menu"
                         transition:slide
-                        style="--comp-switch-size-height: 1.5rem; --comp-switch-size-width: 2.5rem;"
+                        style:--comp-switch-size-height="1.5rem"
+                        style:--comp-switch-size-width="2.5rem"
                     >
                         <span>
                             <label for="volume">Volume:</label>
