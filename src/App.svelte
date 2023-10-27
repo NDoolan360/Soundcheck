@@ -35,13 +35,13 @@
     } from './lib/stores';
     import { clamp, gainFocus, loseFocus } from './lib/utils';
 
-    const nextRepeat = (curr: RepeatState) => () => {
+    const nextRepeat = (curr: Writable<RepeatState>) => () => {
         const map = {
             off: 'context',
             context: 'track',
             track: 'off',
         } as { [name: string]: RepeatState };
-        curr = map[curr];
+        curr.update((val) => map[val]);
     };
 
     const reload = <T,>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
@@ -357,7 +357,7 @@
                             id="repeat"
                             selected={$repeat != 'off'}
                             filled
-                            on:click={nextRepeat($repeat)}
+                            on:click={nextRepeat(repeat)}
                             disabled={$disallows.togglingRepeat}
                         >
                             <i slot="button-icon" class="material-symbols-outlined">
