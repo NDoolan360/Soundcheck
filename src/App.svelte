@@ -32,7 +32,7 @@
         trackId,
         volume,
         type RepeatState,
-    } from './lib/stores';
+    } from './lib/playback';
     import { clamp, gainFocus, loseFocus } from './lib/utils';
 
     const nextRepeat = (curr: Writable<RepeatState>) => () => {
