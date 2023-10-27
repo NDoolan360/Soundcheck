@@ -3,8 +3,9 @@
 <script lang="ts">
     import { tweened, type Readable } from 'svelte/motion';
     import { optional } from '../utils';
-    import './styles/default-scheme.css';
-    import type { Linecap, ProgressColorOptions } from './types';
+
+    type ProgressColorOptions = { indicator?: string; track?: string };
+    type Linecap = 'butt' | 'round' | 'square';
 
     const shrink = (node: Element) => {
         const sw = parseFloat(getComputedStyle(node).strokeWidth);
@@ -48,11 +49,11 @@
 </script>
 
 <svg
-    style:--sm3-comp-progress-size-width={width}
-    style:--sm3-comp-progress-size-thickness={thickness}
-    style:--sm3-comp-progress-style-linecap={linecap}
-    style:--sm3-comp-progress-color-track={color.track}
-    style:--sm3-comp-progress-color-indicator={color.indicator}
+    style:--comp-progress-size-width={width}
+    style:--comp-progress-size-thickness={thickness}
+    style:--comp-progress-style-linecap={linecap}
+    style:--comp-progress-color-track={color.track}
+    style:--comp-progress-color-indicator={color.indicator}
     class:circular
     class:indeterminate
     class:linear={!circular}
@@ -85,38 +86,38 @@
         display: block;
         overflow: visible;
 
-        --_thickness: var(--sm3-comp-progress-size-thickness, 4px);
+        --_thickness: var(--comp-progress-size-thickness, 4px);
     }
 
     svg.linear {
-        width: var(--sm3-comp-progress-size-width, 100%);
+        width: var(--comp-progress-size-width, 100%);
         height: var(--_thickness);
     }
 
     svg.circular {
-        width: var(--sm3-comp-progress-size-width, 48px);
-        height: var(--sm3-comp-progress-size-width, 48px);
+        width: var(--comp-progress-size-width, 48px);
+        height: var(--comp-progress-size-width, 48px);
         transform: rotate(-90deg);
     }
 
     svg * {
         fill: transparent;
-        stroke-linecap: var(--sm3-comp-progress-style-linecap, butt);
+        stroke-linecap: var(--comp-progress-style-linecap, butt);
         stroke-width: var(--_thickness);
         transition: stroke-dashoffset 0.4s;
     }
 
     .indicator {
-        stroke: var(--sm3-comp-progress-color-indicator, rgb(var(--sm3-scheme-color-primary)));
+        stroke: var(--comp-progress-color-indicator, rgb(var(--scheme-color-primary)));
         stroke-dasharray: calc(1px * var(--sm3-val-progress, 0)), calc(1px * (100 - var(--sm3-val-progress, 0)));
     }
 
     line.track {
-        stroke: var(--sm3-comp-progress-color-track, rgb(var(--sm3-scheme-color-surface-container-highest)));
+        stroke: var(--comp-progress-color-track, rgb(var(--scheme-color-surface-container-highest)));
     }
 
     circle.track {
-        stroke: var(--sm3-comp-progress-color-track, transparent);
+        stroke: var(--comp-progress-color-track, transparent);
     }
 
     svg.indeterminate line.indicator {

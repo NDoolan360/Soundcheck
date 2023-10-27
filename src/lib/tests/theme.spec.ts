@@ -1,7 +1,7 @@
 import { Hct, SchemeContent } from '@material/material-color-utilities';
 import { render } from '@testing-library/svelte';
 import App from '../../App.svelte';
-import { toKebabCase, updateStyleSheet } from '../sm3lte/MaterialThemeController';
+import { toKebabCase, updateStyleSheet } from '../theme';
 
 global.fetch = vi.fn().mockImplementation(
     () =>

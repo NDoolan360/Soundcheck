@@ -6,11 +6,11 @@
     import { fade, slide } from 'svelte/transition';
     import ProgressBar from './lib/components/ProgressBar.svelte';
     import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from './lib/settings';
-    import Button from './lib/sm3lte/Button.svelte';
-    import { updateStyleSheet } from './lib/sm3lte/MaterialThemeController';
-    import ProgressIndicator from './lib/sm3lte/ProgressIndicator.svelte';
-    import Snackbar from './lib/sm3lte/Snackbar.svelte';
-    import Switch from './lib/sm3lte/Switch.svelte';
+    import Button from './lib/components/Button.svelte';
+    import { updateStyleSheet } from './lib/theme';
+    import ProgressIndicator from './lib/components/ProgressIndicator.svelte';
+    import Snackbar from './lib/components/Snackbar.svelte';
+    import Switch from './lib/components/Switch.svelte';
     import {
         activeDevice,
         authenticated,
@@ -124,7 +124,7 @@
     <main data-tauri-drag-region bind:clientWidth={mainWidth} bind:clientHeight={mainHeight} transition:fade>
         {#if mainHeight > 70}
             <section id="menu-wrapper" use:loseFocus={closeMenu}>
-                <Button id="spotify-logo" on:click={toggle(menu)}>
+                <Button id="spotify-logo" filled selected height="1.8rem" width="1.8rem" on:click={toggle(menu)}>
                     <svg slot="button-icon" viewBox="0 0 512 512">
                         <path stroke-width={50} d="M95 173s170-49 317 33" />
                         <path stroke-width={42.5} d="M109 256s139-45 271 32m-186-17" />
@@ -132,7 +132,12 @@
                     </svg>
                 </Button>
                 {#if $menu}
-                    <div id="menu" transition:slide>
+                    <div
+                        id="menu"
+                        transition:slide
+                        style:--comp-switch-size-height="1.5rem"
+                        style:--comp-switch-size-width="2.5rem"
+                    >
                         <span>
                             <label for="volume">Volume:</label>
                             <input
@@ -161,11 +166,12 @@
                             </select>
                         </span>
                         <hr />
-                        <Button id={$authenticated ? 'logout' : 'login'} on:click={toggle(authenticated)}>
+                        <Button id={$authenticated ? 'logout' : 'login'} filled on:click={toggle(authenticated)}>
                             {$authenticated ? 'Log Out' : 'Log In'}
                         </Button>
                         <Button
                             id="copy-link"
+                            filled
                             on:click={() => {
                                 if ($songLink) clipboard.writeText($songLink).then(triggerCopiedSnackbar);
                             }}
@@ -173,7 +179,9 @@
                         >
                             Copy Song Link
                         </Button>
-                        <Button id="deep-link" href={$deepLink} disabled={$disallows.link}>Open in Spotify</Button>
+                        <Button id="deep-link" filled href={$deepLink} disabled={$disallows.link}
+                            >Open in Spotify</Button
+                        >
                         <hr />
                         <h3>Settings</h3>
                         <span>
@@ -219,6 +227,9 @@
         <aside id="close">
             <Button
                 id="close-button"
+                height="2rem"
+                width="3rem"
+                radius="0"
                 on:click={() => {
                     tauriWindow.WebviewWindow.getByLabel('player')?.close();
                     tauriWindow.WebviewWindow.getByLabel('auth')?.close();
@@ -237,9 +248,9 @@
                     <span in:fade>
                         <Button
                             id="play-pause-fab"
+                            filled
                             FAB
-                            selected
-                            radius={!$playing ? '50%' : undefined}
+                            selected={$playing}
                             on:click={toggle(playing)}
                             disabled={$disallows.playPause}
                         >
@@ -260,7 +271,6 @@
                 <span in:fade>
                     <Button
                         id="replay-10"
-                        type="standard"
                         on:click={() => ($progress = clamp(0, $progress - 10000, $duration))}
                         disabled={$disallows.seeking}
                     >
@@ -272,7 +282,6 @@
                 <span in:fade>
                     <Button
                         id="skip-previous"
-                        type="standard"
                         on:click={() => invoke('previous_track').then(() => loadingState(500))}
                         disabled={$disallows.skippingPrev}
                     >
@@ -282,7 +291,7 @@
             {/if}
             {#if !(mainWidth > 200 && mainHeight > 125)}
                 <span in:fade>
-                    <Button id="play-pause" type="standard" on:click={toggle(playing)} disabled={$disallows.playPause}>
+                    <Button id="play-pause" on:click={toggle(playing)} disabled={$disallows.playPause}>
                         <i slot="button-icon" class="material-symbols-outlined">
                             {#if stateLoading}
                                 <ProgressIndicator label="loading-state" circular indeterminate />
@@ -308,7 +317,6 @@
                 <span in:fade>
                     <Button
                         id="skip-next"
-                        type="standard"
                         on:click={() => invoke('next_track').then(() => loadingState(500))}
                         disabled={$disallows.skippingNext}
                     >
@@ -321,6 +329,7 @@
                     <span in:fade>
                         <Button
                             id="favorite"
+                            filled
                             selected={$liked}
                             on:click={toggle(liked)}
                             disabled={$disallows.togglingLike}
@@ -334,6 +343,7 @@
                         <Button
                             id="shuffle"
                             selected={$shuffle}
+                            filled
                             on:click={toggle(shuffle)}
                             disabled={$disallows.togglingShuffle}
                         >
@@ -346,12 +356,8 @@
                         <Button
                             id="repeat"
                             selected={$repeat != 'off'}
-<<<<<<< Updated upstream
-                            on:click={nextRepeat($repeat)}
-=======
                             filled
                             on:click={nextRepeat(repeat)}
->>>>>>> Stashed changes
                             disabled={$disallows.togglingRepeat}
                         >
                             <i slot="button-icon" class="material-symbols-outlined">
@@ -364,7 +370,6 @@
                 <span in:fade>
                     <Button
                         id="forward-10"
-                        type="standard"
                         on:click={() => ($progress = clamp(0, $progress + 10000, $duration))}
                         disabled={$disallows.seeking}
                     >
@@ -421,7 +426,7 @@
 
     hr {
         border: none;
-        border-bottom: 2px solid rgb(var(--sm3-scheme-color-outline));
+        border-bottom: 2px solid rgb(var(--scheme-color-outline));
     }
 
     :is(img, #lowres-image, #vignette) {
@@ -442,18 +447,13 @@
     }
 
     #vignette {
-        background-color: rgb(var(--sm3-scheme-color-inverse-primary) / 40%);
-        box-shadow: inset 0 0 80px rgb(var(--sm3-scheme-color-inverse-primary));
-    }
-
-    :global(#spotify-logo) {
-        --sm3-comp-button-size-height: 1.8rem;
-        --sm3-comp-button-size-width: 1.8rem;
+        background-color: rgb(var(--scheme-color-inverse-primary) / 40%);
+        box-shadow: inset 0 0 80px rgb(var(--scheme-color-inverse-primary));
     }
 
     :global(#spotify-logo) svg path {
         fill: none;
-        stroke: rgb(var(--sm3-scheme-color-on-primary));
+        stroke: rgb(var(--scheme-color-on-primary));
         stroke-linecap: round;
     }
 
@@ -468,16 +468,10 @@
         z-index: 10;
         top: 0;
         right: 0;
-
-        --sm3-comp-button-size-height: 2rem;
-        --sm3-comp-button-size-width: 3rem;
-        --sm3-comp-button-size-radius: 0;
-        --sm3-comp-button-color-text: white;
-        --sm3-comp-button-color-background: transparent;
     }
 
     #close :global(#close-button:is(:hover, :focus-visible)) {
-        --sm3-comp-button-color-background: red;
+        --comp-button-color-background: red;
     }
 
     #menu {
@@ -488,14 +482,11 @@
         max-height: calc(100vh - 4rem);
         padding: 0.5rem;
         border-radius: 0.25rem;
-        background-color: rgb(var(--sm3-scheme-color-surface-container));
-        color: rgb(var(--sm3-scheme-color-on-surface));
+        background-color: rgb(var(--scheme-color-surface-container));
+        color: rgb(var(--scheme-color-on-surface));
         gap: 1rem;
         overflow-y: auto;
         pointer-events: auto;
-
-        --sm3-comp-switch-size-height: 1.5rem;
-        --sm3-comp-switch-size-width: 2.5rem;
     }
 
     #menu::-webkit-scrollbar {
@@ -503,14 +494,14 @@
     }
 
     #menu::-webkit-scrollbar-track {
-        background-color: rgb(var(--sm3-scheme-color-surface-container));
+        background-color: rgb(var(--scheme-color-surface-container));
         border-bottom-right-radius: 0.25rem;
         border-top-right-radius: 0.25rem;
     }
 
     #menu::-webkit-scrollbar-thumb {
         border-radius: 0.25rem;
-        background-color: rgb(var(--sm3-scheme-color-on-surface-variant));
+        background-color: rgb(var(--scheme-color-on-surface-variant));
     }
 
     #info {
@@ -525,9 +516,5 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    #controls :global(.standard) {
-        --sm3-comp-button-color-text: white;
     }
 </style>

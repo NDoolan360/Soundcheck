@@ -1,0 +1,43 @@
+@import url('/fonts/roboto.css');
+@import url('/fonts/material-symbols-outlined.css');
+
+:root {
+    color-scheme: dark;
+    font-family: Roboto, sans-serif;
+    letter-spacing: 0.25px;
+    line-height: 20px;
+
+    /* State Layer Opacities */
+    --dragged-state-layer-opacity: 0.16;
+    --pressed-state-layer-opacity: 0.12;
+    --focus-state-layer-opacity: 0.12;
+    --hover-state-layer-opacity: 0.08;
+
+    /* Corner Rounding */
+    --corner-full: 99999px;
+    --corner-extra-large: 28px;
+    --corner-large: 16px;
+    --corner-medium: 12px;
+    --corner-small: 8px;
+    --corner-extra-small: 4px;
+}
+
+* {
+    margin: 0;
+    user-select: none;
+}
+
+body {
+    overflow: hidden;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 0.35rem;
+    background-color: rgb(var(--scheme-color-inverse-primary));
+}
+
+#app {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0.35rem;
+    padding-bottom: 0;
+}

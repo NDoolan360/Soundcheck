@@ -4,11 +4,12 @@
     import { fly } from 'svelte/transition';
     import { optional } from '../utils';
     import Button from './Button.svelte';
-    import './styles/default-scheme.css';
-    import './styles/elevation.css';
-    import './styles/shape.css';
-    import './styles/typography.css';
-    import type { SnackbarColorOptions } from './types';
+
+    type SnackbarColorOptions = {
+        text?: string;
+        action?: string;
+        background?: string;
+    };
 
     const dispatch = createEventDispatcher();
 
@@ -47,12 +48,11 @@
     <aside
         style:flex-wrap={actionsWidth > 120 ? 'wrap' : 'nowrap'}
         style:margin={alignLeft ? '8px' : '8px auto'}
-        style:--sm3-comp-snackbar-size-height={height}
-        style:--sm3-comp-snackbar-size-width={width}
-        style:--sm3-comp-snackbar-color-text={color.text}
-        style:--sm3-comp-snackbar-color-actions={color.text}
-        style:--sm3-comp-snackbar-color-background={color.background}
-        class="elevation-3 shape-extra-small"
+        style:--comp-snackbar-size-height={height}
+        style:--comp-snackbar-size-width={width}
+        style:--comp-snackbar-color-text={color.text}
+        style:--comp-snackbar-color-actions={color.text}
+        style:--comp-snackbar-color-background={color.background}
         class:has-actions={hasActions}
         aria-relevant="additions"
         role="status"
@@ -70,10 +70,9 @@
                     <Button
                         id="dismiss-snackbar"
                         color={{
-                            text: `var(--sm3-comp-snackbar-color-text,
-										rgb(var(--sm3-scheme-color-inverse-on-surface)))`,
+                            text: `var(--comp-snackbar-color-text,
+										rgb(var(--scheme-color-inverse-on-surface)))`,
                         }}
-                        type="standard"
                         on:click={close}
                     >
                         <i slot="button-icon" class="material-symbols-outlined">close</i>
@@ -90,13 +89,15 @@
         z-index: 999;
         display: flex;
         width: 100%;
-        width: var(--sm3-comp-snackbar-size-width, 100%);
-        min-height: var(--sm3-comp-snackbar-size-height, 48px);
+        width: var(--comp-snackbar-size-width, 100%);
+        min-height: var(--comp-snackbar-size-height, 48px);
         flex-direction: row;
         align-items: center;
         justify-content: center;
         justify-content: start;
-        background-color: var(--sm3-comp-snackbar-color-background, rgb(var(--sm3-scheme-color-inverse-surface)));
+        border-radius: var(--corner-extra-small);
+        background-color: var(--comp-snackbar-color-background, rgb(var(--scheme-color-inverse-surface)));
+        box-shadow: 0 0 6px rgb(var(--scheme-color-shadow, 0 0 0));
         gap: 0;
         inset: auto 0 0;
         pointer-events: none;
@@ -104,20 +105,20 @@
 
     @media (width >= 800px) {
         aside {
-            max-width: var(--sm3-comp-snackbar-size-width, 450px);
+            max-width: var(--comp-snackbar-size-width, 450px);
         }
     }
 
     .text::before {
-        display: var(--sm3-comp-snackbar-val-pretext, none);
+        display: var(--comp-snackbar-val-pretext, none);
         width: 100%;
-        content: var(--sm3-comp-snackbar-val-pretext);
+        content: var(--comp-snackbar-val-pretext);
     }
 
     .text {
         flex-shrink: 1;
         padding: 16px;
-        color: var(--sm3-comp-snackbar-color-text, rgb(var(--sm3-scheme-color-inverse-on-surface)));
+        color: var(--comp-snackbar-color-text, rgb(var(--scheme-color-inverse-on-surface)));
         gap: 0;
     }
 
@@ -138,11 +139,8 @@
     }
 
     .actions :global([slot='snackbar-action-label']) {
-        color: var(--sm3-comp-snackbar-color-actions, rgb(var(--sm3-scheme-color-inverse-primary)));
+        color: var(--comp-snackbar-color-actions, rgb(var(--scheme-color-inverse-primary)));
 
-        --sm3-comp-button-color-text: var(
-            --sm3-comp-snackbar-color-actions,
-            rgb(var(--sm3-scheme-color-inverse-primary))
-        );
+        --comp-button-color-text: var(--comp-snackbar-color-actions, rgb(var(--scheme-color-inverse-primary)));
     }
 </style>

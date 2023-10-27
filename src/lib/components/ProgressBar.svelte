@@ -1,7 +1,5 @@
 <script lang="ts">
     import { afterUpdate, createEventDispatcher } from 'svelte';
-    import '../sm3lte/styles/default-scheme.css';
-    import '../sm3lte/styles/elevation.css';
     import { prettyTime } from '../utils';
     import Wave from './Wave.svelte';
 
@@ -32,7 +30,7 @@
     <label bind:clientWidth={sliderWidth} class="slider-wrapper">
         <input
             class="slider"
-            style:background="linear-gradient(to right, transparent {progressPos}, rgb(var(--sm3-scheme-color-outline)) {progressPos})"
+            style:background="linear-gradient(to right, transparent {progressPos}, rgb(var(--scheme-color-outline)) {progressPos})"
             bind:this={progressBar}
             on:change={() => {
                 scrubbing = false;
@@ -75,8 +73,8 @@
         height: fit-content;
         padding: 0.25rem;
         border-radius: 0.5rem;
-        background-color: rgb(var(--sm3-scheme-color-surface-variant));
-        color: rgb(var(--sm3-scheme-color-on-surface-variant));
+        background-color: rgb(var(--scheme-color-surface-variant));
+        color: rgb(var(--scheme-color-on-surface-variant));
         font-size: 0.75rem;
         font-weight: 700;
         pointer-events: none;
@@ -101,7 +99,7 @@
         border-radius: 3px;
         appearance: none;
         background: white;
-        box-shadow: var(--sm3-sys-elevation-level3);
+        box-shadow: 0 0 3px rgb(var(--scheme-color-shadow, 0 0 0));
     }
 
     .slider:focus-visible {
@@ -109,7 +107,7 @@
     }
 
     .slider:focus-visible::-webkit-slider-thumb {
-        background-color: rgb(var(--sm3-scheme-color-outline));
+        background-color: rgb(var(--scheme-color-outline));
         outline: auto 3px;
     }
 
