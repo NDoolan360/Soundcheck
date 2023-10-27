@@ -1,5 +1,4 @@
 import App from './App.svelte';
-import './material-symbols-outlined.css';
 import './styles.css';
 
 const app = new App({

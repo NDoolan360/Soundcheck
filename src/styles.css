@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:700,500,400&display=swap');
+@import url('/fonts/roboto.css');
+@import url('/fonts/material-symbols-outlined.css');
 
 :root {
     color-scheme: dark;
@@ -26,18 +27,17 @@
     user-select: none;
 }
 
-:is(body, #app) {
-    box-sizing: border-box;
-    padding: 0.35rem;
-}
-
 body {
     overflow: hidden;
     height: 100vh;
+    box-sizing: border-box;
+    padding: 0.35rem;
     background-color: rgb(var(--scheme-color-inverse-primary));
 }
 
 #app {
     height: 100%;
+    box-sizing: border-box;
+    padding: 0.35rem;
     padding-bottom: 0;
 }
