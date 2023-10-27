@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { isReloadable, type Loadable, type Writable } from '@square/svelte-store';
+    import { isReloadable, type Loadable } from '@square/svelte-store';
     import { clipboard, invoke, window as tauriWindow } from '@tauri-apps/api';
     import { onMount } from 'svelte';
     import { get, writable } from 'svelte/store';
     import { fade, slide } from 'svelte/transition';
-    import ProgressBar from './lib/components/ProgressBar.svelte';
-    import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from './lib/settings';
     import Button from './lib/components/Button.svelte';
-    import { updateStyleSheet } from './lib/theme';
+    import Controls from './lib/components/Controls.svelte';
     import ProgressIndicator from './lib/components/ProgressIndicator.svelte';
     import Snackbar from './lib/components/Snackbar.svelte';
     import Switch from './lib/components/Switch.svelte';
@@ -20,47 +18,31 @@
         disallows,
         duration,
         images,
-        liked,
+        loading,
         playing,
         progress,
-        repeat,
-        shuffle,
         songLink,
         state,
         subheading,
         title,
         trackId,
         volume,
-        type RepeatState,
     } from './lib/playback';
-    import { clamp, gainFocus, loseFocus } from './lib/utils';
-
-    const nextRepeat = (curr: Writable<RepeatState>) => () => {
-        const map = {
-            off: 'context',
-            context: 'track',
-            track: 'off',
-        } as { [name: string]: RepeatState };
-        curr.update((val) => map[val]);
-    };
+    import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from './lib/settings';
+    import { updateStyleSheet } from './lib/theme';
+    import { gainFocus, loseFocus, toggle } from './lib/utils';
 
     const reload = <T,>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
         setTimeout(() => isReloadable(loadbale) && loadbale.reload().then(cb), delay);
-    };
-    const loadingState = (delay: number) => {
-        stateLoading = true;
-        reload(state, delay, () => (stateLoading = false));
     };
 
     export let screenActive = false;
 
     let menu = writable(false);
     const closeMenu = () => ($menu = false);
-    const toggle = (val: Writable<boolean>) => () => val.update((v) => !v);
 
     let mainWidth: number;
     let mainHeight: number;
-    let stateLoading = false;
     let triggerCopiedSnackbar: () => void;
 
     gainFocus(document.body, () => (screenActive = true));
@@ -80,7 +62,7 @@
         const optimiticProgressUpdate = setInterval(
             (delta: number) => {
                 if ($playing && displayedProgress + delta > $duration) {
-                    loadingState($duration - displayedProgress + 500);
+                    loading.set(true);
                 } else if ($playing) displayedProgress += delta;
             },
             1000,
@@ -255,7 +237,7 @@
                             disabled={$disallows.playPause}
                         >
                             <i slot="button-icon" class="material-symbols-outlined">
-                                {#if stateLoading}
+                                {#if $loading}
                                     <ProgressIndicator label="loading-state-fab" circular indeterminate />
                                 {:else}
                                     {$playing ? 'pause' : 'play_arrow'}
@@ -267,116 +249,7 @@
             </section>
         {/if}
         <section id="controls" class={$currentType}>
-            {#if $currentType === 'episode'}
-                <span in:fade>
-                    <Button
-                        id="replay-10"
-                        on:click={() => ($progress = clamp(0, $progress - 10000, $duration))}
-                        disabled={$disallows.seeking}
-                    >
-                        <i slot="button-icon" class="material-symbols-outlined"> replay_10 </i>
-                    </Button>
-                </span>
-            {/if}
-            {#if ($currentType === 'episode' && mainWidth > 300) || mainWidth > 135}
-                <span in:fade>
-                    <Button
-                        id="skip-previous"
-                        on:click={() => invoke('previous_track').then(() => loadingState(500))}
-                        disabled={$disallows.skippingPrev}
-                    >
-                        <i slot="button-icon" class="material-symbols-outlined"> skip_previous </i>
-                    </Button>
-                </span>
-            {/if}
-            {#if !(mainWidth > 200 && mainHeight > 125)}
-                <span in:fade>
-                    <Button id="play-pause" on:click={toggle(playing)} disabled={$disallows.playPause}>
-                        <i slot="button-icon" class="material-symbols-outlined">
-                            {#if stateLoading}
-                                <ProgressIndicator label="loading-state" circular indeterminate />
-                            {:else}
-                                {$playing ? 'pause' : 'play_arrow'}
-                            {/if}
-                        </i>
-                    </Button>
-                </span>
-            {/if}
-            {#if mainWidth > 200}
-                <span id="progress" in:fade>
-                    <ProgressBar
-                        playing={$playing}
-                        progress={displayedProgress}
-                        duration={$duration}
-                        on:click={({ detail }) => ($progress = detail)}
-                        disabled={$disallows.seeking}
-                    />
-                </span>
-            {/if}
-            {#if ($currentType === 'episode' && mainWidth > 250) || mainWidth > 100}
-                <span in:fade>
-                    <Button
-                        id="skip-next"
-                        on:click={() => invoke('next_track').then(() => loadingState(500))}
-                        disabled={$disallows.skippingNext}
-                    >
-                        <i slot="button-icon" class="material-symbols-outlined"> skip_next </i>
-                    </Button>
-                </span>
-            {/if}
-            {#if $currentType === 'track'}
-                {#if mainWidth > 250}
-                    <span in:fade>
-                        <Button
-                            id="favorite"
-                            filled
-                            selected={$liked}
-                            on:click={toggle(liked)}
-                            disabled={$disallows.togglingLike}
-                        >
-                            <i slot="button-icon" class="material-symbols-outlined"> favorite </i>
-                        </Button>
-                    </span>
-                {/if}
-                {#if mainWidth > 300}
-                    <span in:fade>
-                        <Button
-                            id="shuffle"
-                            selected={$shuffle}
-                            filled
-                            on:click={toggle(shuffle)}
-                            disabled={$disallows.togglingShuffle}
-                        >
-                            <i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
-                        </Button>
-                    </span>
-                {/if}
-                {#if mainWidth > 350}
-                    <span in:fade>
-                        <Button
-                            id="repeat"
-                            selected={$repeat != 'off'}
-                            filled
-                            on:click={nextRepeat(repeat)}
-                            disabled={$disallows.togglingRepeat}
-                        >
-                            <i slot="button-icon" class="material-symbols-outlined">
-                                {$repeat == 'track' ? 'repeat_one' : 'repeat'}
-                            </i>
-                        </Button>
-                    </span>
-                {/if}
-            {:else if $currentType === 'episode'}
-                <span in:fade>
-                    <Button
-                        id="forward-10"
-                        on:click={() => ($progress = clamp(0, $progress + 10000, $duration))}
-                        disabled={$disallows.seeking}
-                    >
-                        <i slot="button-icon" class="material-symbols-outlined"> forward_10 </i>
-                    </Button>
-                </span>
-            {/if}
+            <Controls width={mainWidth} hidePlayPause={mainWidth <= 250} {displayedProgress} />
         </section>
     </main>
 {/if}
@@ -418,7 +291,6 @@
     }
 
     input[type='range'],
-    :global(#progress),
     select {
         min-width: 3.5rem;
         flex: 1 1;
