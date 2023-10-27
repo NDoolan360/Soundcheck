@@ -2,7 +2,23 @@
 
 :root {
     color-scheme: dark;
-    font-family: Roboto, Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
+    letter-spacing: 0.25px;
+    line-height: 20px;
+
+    /* State Layer Opacities */
+    --dragged-state-layer-opacity: 0.16;
+    --pressed-state-layer-opacity: 0.12;
+    --focus-state-layer-opacity: 0.12;
+    --hover-state-layer-opacity: 0.08;
+
+    /* Corner Rounding */
+    --corner-full: 99999px;
+    --corner-extra-large: 28px;
+    --corner-large: 16px;
+    --corner-medium: 12px;
+    --corner-small: 8px;
+    --corner-extra-small: 4px;
 }
 
 * {
@@ -18,7 +34,7 @@
 body {
     overflow: hidden;
     height: 100vh;
-    background-color: rgb(var(--sm3-scheme-color-inverse-primary));
+    background-color: rgb(var(--scheme-color-inverse-primary));
 }
 
 #app {

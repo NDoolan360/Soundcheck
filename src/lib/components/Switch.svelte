@@ -1,10 +1,12 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import { optional } from '../utils';
-    import './styles/default-scheme.css';
-    import './styles/shape.css';
-    import './styles/state.css';
-    import type { SwitchColorOptions } from './types';
+
+    type SwitchState = { checked?: string; unchecked?: string };
+    type SwitchColorOptions = {
+        foreground?: SwitchState;
+        background?: SwitchState;
+    };
 
     export let label: string;
     export let checked: boolean = false;
@@ -18,13 +20,13 @@
 </script>
 
 <button
-    style:--sm3-comp-switch-color-foreground-on={color.foreground?.checked}
-    style:--sm3-comp-switch-color-background-on={color.background?.checked}
-    style:--sm3-comp-switch-color-foreground-off={color.foreground?.unchecked}
-    style:--sm3-comp-switch-color-background-off={color.background?.unchecked}
-    style:--sm3-comp-switch-size-width={width}
-    style:--sm3-comp-switch-size-height={height}
-    style:--sm3-comp-switch-size-radius={radius}
+    style:--comp-switch-color-foreground-on={color.foreground?.checked}
+    style:--comp-switch-color-background-on={color.background?.checked}
+    style:--comp-switch-color-foreground-off={color.foreground?.unchecked}
+    style:--comp-switch-color-background-off={color.background?.unchecked}
+    style:--comp-switch-size-width={width}
+    style:--comp-switch-size-height={height}
+    style:--comp-switch-size-radius={radius}
     class:checked
     aria-checked={checked}
     aria-label={label}
@@ -55,12 +57,9 @@
         min-width: var(--_width);
         height: var(--_height);
         padding: 0;
-        border: 2px solid var(--sm3-comp-switch-color-foreground-off, rgb(var(--sm3-scheme-color-outline)));
-        border-radius: var(--sm3-comp-switch-size-radius, var(--sm3-sys-shape-corner-full-default-size));
-        background-color: var(
-            --sm3-comp-switch-color-background-off,
-            rgb(var(--sm3-scheme-color-surface-container-highest))
-        );
+        border: 2px solid var(--comp-switch-color-foreground-off, rgb(var(--scheme-color-outline)));
+        border-radius: var(--comp-switch-size-radius, var(--corner-full));
+        background-color: var(--comp-switch-color-background-off, rgb(var(--scheme-color-surface-container-highest)));
         cursor: pointer;
         transition:
             outline-width 0s,
@@ -68,47 +67,47 @@
             color 0.4s,
             border-color 0.4s;
 
-        --_width: var(--sm3-comp-switch-size-width, 52px);
-        --_height: var(--sm3-comp-switch-size-height, 32px);
+        --_width: var(--comp-switch-size-width, 52px);
+        --_height: var(--comp-switch-size-height, 32px);
     }
 
     button::before {
         position: absolute;
         border-radius: inherit;
-        background-color: var(--sm3-comp-switch-color-background-on, rgb(var(--sm3-scheme-color-primary)));
+        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
         content: '';
         inset: 0;
         opacity: 0;
     }
 
     button:hover:not(:disabled)::before {
-        opacity: var(--sm3-sys-state-hover-state-layer-opacity);
+        opacity: var(--hover-state-layer-opacity);
     }
 
     button:focus-visible:not(:disabled)::before {
-        opacity: var(--sm3-sys-state-focus-state-layer-opacity);
+        opacity: var(--focus-state-layer-opacity);
     }
 
     button:active:not(:disabled)::before {
-        opacity: var(--sm3-sys-state-pressed-state-layer-opacity);
+        opacity: var(--pressed-state-layer-opacity);
     }
 
     button:disabled {
-        border-color: rgb(var(--sm3-scheme-color-on-surface) / 12%);
-        background-color: rgb(var(--sm3-scheme-color-surface-container-highest) / 12%);
+        border-color: rgb(var(--scheme-color-on-surface) / 12%);
+        background-color: rgb(var(--scheme-color-surface-container-highest) / 12%);
     }
 
     button.checked {
         border-color: transparent;
-        background-color: var(--sm3-comp-switch-color-background-on, rgb(var(--sm3-scheme-color-primary)));
+        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
     }
 
     button.checked::before {
-        background-color: var(--sm3-comp-switch-color-background-on, rgb(var(--sm3-scheme-color-primary)));
+        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
     }
 
     button.checked:disabled {
-        background-color: rgb(var(--sm3-scheme-color-on-surface) / 12%);
+        background-color: rgb(var(--scheme-color-on-surface) / 12%);
     }
 
     span {
@@ -127,14 +126,14 @@
 
     button span {
         left: 0;
-        background-color: var(--sm3-comp-switch-color-foreground-off, rgb(var(--sm3-scheme-color-outline)));
-        color: var(--sm3-comp-switch-color-background-off, rgb(var(--sm3-scheme-color-surface-container-highest)));
+        background-color: var(--comp-switch-color-foreground-off, rgb(var(--scheme-color-outline)));
+        color: var(--comp-switch-color-background-off, rgb(var(--scheme-color-surface-container-highest)));
     }
 
     button.checked span {
         left: calc(var(--_width) - var(--_height));
-        background-color: var(--sm3-comp-switch-color-foreground-on, rgb(var(--sm3-scheme-color-on-primary)));
-        color: var(--sm3-comp-switch-color-background-on, rgb(var(--sm3-scheme-color-primary)));
+        background-color: var(--comp-switch-color-foreground-on, rgb(var(--scheme-color-on-primary)));
+        color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
     }
 
     button span:not(.icon) {
@@ -143,8 +142,8 @@
     }
 
     button:disabled span {
-        background-color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
-        color: rgb(var(--sm3-scheme-color-surface));
+        background-color: rgb(var(--scheme-color-on-surface) / 38%);
+        color: rgb(var(--scheme-color-surface));
     }
 
     button.checked span:not(.icon) {
@@ -153,8 +152,8 @@
     }
 
     button.checked:disabled span {
-        background-color: rgb(var(--sm3-scheme-color-surface));
-        color: rgb(var(--sm3-scheme-color-on-surface) / 38%);
+        background-color: rgb(var(--scheme-color-surface));
+        color: rgb(var(--scheme-color-on-surface) / 38%);
     }
 
     div {

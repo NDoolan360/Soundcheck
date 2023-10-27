@@ -61,7 +61,7 @@ export const updateStyleSheet = async (
     darkMode = false,
     contrast = 0,
     schemeType = 'content',
-    cssPrefix = 'sm3-scheme'
+    cssPrefix = 'scheme'
 ) => {
     let dynamicScheme;
     let argbSource;
