@@ -54,7 +54,7 @@
 {/if}
 {#if !hidePlayPause}
     <span in:fade>
-        <Button id="play-pause" on:click={toggle(playing)} disabled={$disallows.playPause}>
+        <Button id="play-pause" on:click={() => toggle(playing)} disabled={$disallows.playPause}>
             <i slot="button-icon" class="material-symbols-outlined">
                 {#if $loading}
                     <ProgressIndicator label="loading-state" circular indeterminate />
@@ -90,7 +90,13 @@
 {#if $currentType === 'track'}
     {#if width > 250}
         <span in:fade>
-            <Button id="favorite" filled selected={$liked} on:click={toggle(liked)} disabled={$disallows.togglingLike}>
+            <Button
+                id="favorite"
+                filled
+                selected={$liked}
+                on:click={() => toggle(liked)}
+                disabled={$disallows.togglingLike}
+            >
                 <i slot="button-icon" class="material-symbols-outlined"> favorite </i>
             </Button>
         </span>
@@ -99,9 +105,9 @@
         <span in:fade>
             <Button
                 id="shuffle"
-                selected={$shuffle}
                 filled
-                on:click={toggle(shuffle)}
+                selected={$shuffle}
+                on:click={() => toggle(shuffle)}
                 disabled={$disallows.togglingShuffle}
             >
                 <i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
@@ -112,9 +118,9 @@
         <span in:fade>
             <Button
                 id="repeat"
-                selected={$repeat != 'off'}
                 filled
-                on:click={nextRepeat(repeat)}
+                selected={$repeat != 'off'}
+                on:click={() => nextRepeat(repeat)}
                 disabled={$disallows.togglingRepeat}
             >
                 <i slot="button-icon" class="material-symbols-outlined">

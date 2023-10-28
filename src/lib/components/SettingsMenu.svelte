@@ -27,7 +27,7 @@
 </script>
 
 <div use:loseFocus={closeMenu}>
-    <Button id="spotify-logo" filled selected height="1.8rem" width="1.8rem" on:click={toggle(menu)}>
+    <Button id="spotify-logo" filled selected height="1.8rem" width="1.8rem" on:click={() => toggle(menu)}>
         <svg slot="button-icon" viewBox="0 0 512 512">
             <path stroke-width={50} d="M95 173s170-49 317 33" />
             <path stroke-width={42.5} d="M109 256s139-45 271 32m-186-17" />
@@ -59,7 +59,7 @@
                 </select>
             </span>
             <hr />
-            <Button id={$authenticated ? 'logout' : 'login'} filled on:click={toggle(authenticated)}>
+            <Button id={$authenticated ? 'logout' : 'login'} filled on:click={() => toggle(authenticated)}>
                 {$authenticated ? 'Log Out' : 'Log In'}
             </Button>
             <Button
