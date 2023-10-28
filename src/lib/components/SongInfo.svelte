@@ -10,10 +10,10 @@
 <style>
     hgroup {
         display: flex;
+        overflow: hidden;
         flex-direction: column;
         justify-content: start;
         pointer-events: none;
-        overflow: hidden;
     }
 
     hgroup * {

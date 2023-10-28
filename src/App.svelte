@@ -9,7 +9,7 @@
     import PlayPauseFab from './lib/components/PlayPauseFAB.svelte';
     import SettingsMenu from './lib/components/SettingsMenu.svelte';
     import SongInfo from './lib/components/SongInfo.svelte';
-    import { currentType, images, state, trackId } from './lib/playback';
+    import { images, state, trackId } from './lib/playback';
     import { alwaysShowArtwork, alwaysShowControls, darkMode } from './lib/settings';
     import { updateStyleSheet } from './lib/theme';
     import { gainFocus, loseFocus, reload } from './lib/utils';
@@ -81,6 +81,17 @@
         flex-direction: column;
     }
 
+    section {
+        display: flex;
+        max-width: 100%;
+        flex-flow: row wrap;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.35rem;
+        pointer-events: none;
+    }
+
     main section:first-of-type {
         margin-bottom: auto;
     }
@@ -89,24 +100,13 @@
         margin-top: auto;
     }
 
-    section {
-        display: flex;
-        max-width: 100%;
-        flex-flow: row wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.35rem;
-        flex-wrap: nowrap;
-        pointer-events: none;
-    }
-
     #vignette {
         position: absolute;
         z-index: -10;
         width: 100%;
         height: 100%;
-        inset: 0;
         background-color: rgb(var(--scheme-color-inverse-primary) / 40%);
         box-shadow: inset 0 0 80px rgb(var(--scheme-color-inverse-primary));
+        inset: 0;
     }
 </style>

@@ -54,14 +54,12 @@
         min-height: var(--comp-button-size-height, var(--_height, 40px));
         align-items: center;
         justify-content: center;
-
         padding: var(--_padding, 0 24px);
         border: var(--_border, none);
         border-radius: var(--comp-button-size-radius, var(--_radius, var(--corner-full)));
         background-color: var(--comp-button-color-background, rgb(var(--_background-color, transparent)));
         box-shadow: 0 0 var(--_elevation, 0) rgb(var(--scheme-color-shadow));
         color: var(--comp-button-color-text, rgb(var(--_text-color, white)));
-
         cursor: pointer;
         font-weight: 700;
         gap: 8px;

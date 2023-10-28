@@ -7,11 +7,10 @@
     import Switch from '../sub_components/Switch.svelte';
     import { activeDevice, authenticated, deepLink, devices, disallows, songLink, volume } from '../playback';
     import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from '../settings';
-    import { loseFocus, reload, toggle } from '../utils';
+    import { loseFocus, reload, toggle, inBrowser } from '../utils';
     import { onMount } from 'svelte';
 
     const closeMenu = () => ($menu = false);
-    const updateAlwaysOnTop = (value: boolean) => tauriWindow.appWindow.setAlwaysOnTop(value);
 
     let menu = writable(false);
     let triggerCopiedSnackbar: () => void;
@@ -24,7 +23,7 @@
         return () => clearInterval(autoReloadDevices);
     });
 
-    $: updateAlwaysOnTop($keepOnTop);
+    $: !inBrowser && tauriWindow.appWindow.setAlwaysOnTop($keepOnTop);
 </script>
 
 <div use:loseFocus={closeMenu}>
