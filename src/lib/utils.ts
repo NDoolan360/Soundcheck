@@ -57,9 +57,9 @@ export const newSettingStore = <T>(key: string, initial: T) => {
 
 export const cloneObject = (obj: unknown) => JSON.parse(JSON.stringify(obj));
 
-export const toggle = (val: Writable<boolean>) => () => val.update((v) => !v);
+export const toggle = (val: Writable<boolean>) => val.update((v) => !v);
 
-export const nextRepeat = (curr: Writable<RepeatState>) => () => {
+export const nextRepeat = (curr: Writable<RepeatState>) => {
     const map = {
         off: 'context',
         context: 'track',

@@ -13,7 +13,7 @@
         height="56px"
         filled
         radius={$playing ? 'var(--corner-large)' : '50%'}
-        on:click={toggle(playing)}
+        on:click={() => toggle(playing)}
         disabled={$disallows.playPause}
     >
         <i slot="button-icon" class="material-symbols-outlined">
