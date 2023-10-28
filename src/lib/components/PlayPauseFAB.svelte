@@ -31,10 +31,10 @@
         display: flex;
         max-width: 100%;
         flex-flow: row wrap;
+        flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
         gap: 0.35rem;
-        flex-wrap: nowrap;
         pointer-events: none;
     }
 
