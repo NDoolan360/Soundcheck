@@ -12,7 +12,7 @@
     import { images, state, trackId } from './lib/playback';
     import { alwaysShowArtwork, alwaysShowControls, darkMode } from './lib/settings';
     import { updateStyleSheet } from './lib/theme';
-    import { gainFocus, loseFocus, reload } from './lib/utils';
+    import { gainFocus, loseFocus } from './lib/utils';
 
     export let screenActive = false;
 
@@ -25,7 +25,7 @@
     onMount(() => {
         let autoReloadState: NodeJS.Timeout;
         invoke<number>('refresh_rate', {}).then((refresh_rate) => {
-            autoReloadState = setInterval(reload, refresh_rate, state);
+            autoReloadState = setInterval(() => state.reload!(), refresh_rate);
         });
         return () => clearInterval(autoReloadState);
     });

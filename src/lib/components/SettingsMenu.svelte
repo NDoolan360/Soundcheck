@@ -7,7 +7,7 @@
     import Switch from '../sub_components/Switch.svelte';
     import { activeDevice, authenticated, deepLink, devices, disallows, songLink, volume } from '../playback';
     import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from '../settings';
-    import { loseFocus, reload, toggle, inBrowser } from '../utils';
+    import { loseFocus, toggle, inBrowser } from '../utils';
     import { onMount } from 'svelte';
 
     const closeMenu = () => ($menu = false);
@@ -18,7 +18,7 @@
     onMount(() => {
         let autoReloadDevices: NodeJS.Timeout;
         invoke<number>('refresh_rate', {}).then((refresh_rate) => {
-            autoReloadDevices = setInterval(reload, refresh_rate * 3, devices);
+            autoReloadDevices = setInterval(() => devices.reload!(), refresh_rate * 3);
         });
         return () => clearInterval(autoReloadDevices);
     });
