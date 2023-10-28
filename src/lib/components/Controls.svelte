@@ -1,24 +1,42 @@
 <script lang="ts">
     import { invoke } from '@tauri-apps/api';
+    import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
-    import Button from '../components/Button.svelte';
-    import ProgressBar from '../components/ProgressBar.svelte';
-    import ProgressIndicator from '../components/ProgressIndicator.svelte';
-    import { currentType, disallows, duration, liked, loading, playing, progress, repeat, shuffle } from '../playback';
-    import { clamp, nextRepeat, toggle } from '../utils';
+    import {
+        currentType,
+        disallows,
+        displayedProgress,
+        duration,
+        liked,
+        loading,
+        playing,
+        progress,
+        repeat,
+        shuffle,
+    } from '../playback';
+    import Button from '../sub_components/Button.svelte';
+    import ProgressIndicator from '../sub_components/ProgressIndicator.svelte';
+    import { nextRepeat, toggle } from '../utils';
+    import ProgressBar from './ProgressBar.svelte';
 
     export let width: number;
     export let hidePlayPause: boolean;
-    export let displayedProgress: number;
+
+    onMount(() => {
+        const optimiticProgressUpdate = setInterval(
+            (delta: number) => {
+                if ($playing) displayedProgress.update((v) => v + delta);
+            },
+            1000,
+            990
+        );
+        return () => clearInterval(optimiticProgressUpdate);
+    });
 </script>
 
 {#if $currentType === 'episode'}
     <span in:fade>
-        <Button
-            id="replay-10"
-            on:click={() => ($progress = clamp(0, $progress - 10000, $duration))}
-            disabled={$disallows.seeking}
-        >
+        <Button id="replay-10" on:click={() => ($progress = $progress - 10000)} disabled={$disallows.seeking}>
             <i slot="button-icon" class="material-symbols-outlined"> replay_10 </i>
         </Button>
     </span>
@@ -34,7 +52,7 @@
         </Button>
     </span>
 {/if}
-{#if !(width > 200) || hidePlayPause}
+{#if !hidePlayPause}
     <span in:fade>
         <Button id="play-pause" on:click={toggle(playing)} disabled={$disallows.playPause}>
             <i slot="button-icon" class="material-symbols-outlined">
@@ -51,7 +69,7 @@
     <span id="progress" in:fade>
         <ProgressBar
             playing={$playing}
-            progress={displayedProgress}
+            progress={$displayedProgress}
             duration={$duration}
             on:click={({ detail }) => ($progress = detail)}
             disabled={$disallows.seeking}
@@ -107,18 +125,14 @@
     {/if}
 {:else if $currentType === 'episode'}
     <span in:fade>
-        <Button
-            id="forward-10"
-            on:click={() => ($progress = clamp(0, $progress + 10000, $duration))}
-            disabled={$disallows.seeking}
-        >
+        <Button id="forward-10" on:click={() => ($progress = $progress + 10000)} disabled={$disallows.seeking}>
             <i slot="button-icon" class="material-symbols-outlined"> forward_10 </i>
         </Button>
     </span>
 {/if}
 
 <style>
-    :is(span) {
+    span {
         display: flex;
         max-width: 100%;
         flex-flow: row wrap;

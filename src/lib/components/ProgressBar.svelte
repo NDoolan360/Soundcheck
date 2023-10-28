@@ -1,7 +1,7 @@
 <script lang="ts">
     import { afterUpdate, createEventDispatcher } from 'svelte';
     import { prettyTime } from '../utils';
-    import Wave from './Wave.svelte';
+    import Wave from '../sub_components/Wave.svelte';
 
     const dispatch = createEventDispatcher();
 
