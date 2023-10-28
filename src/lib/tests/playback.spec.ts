@@ -1,4 +1,4 @@
-import type { Loadable, WritableLoadable } from '@square/svelte-store';
+import { reloadAll, type Loadable, type WritableLoadable } from '@square/svelte-store';
 import { mockIPC } from '@tauri-apps/api/mocks';
 import {
     activeDevice,
@@ -6,6 +6,8 @@ import {
     currentType,
     deepLink,
     devices,
+    disallows,
+    displayedProgress,
     duration,
     images,
     liked,
@@ -20,8 +22,9 @@ import {
     trackId,
     volume,
     type RepeatState,
-    disallows,
+    loading,
 } from '../playback';
+import { cloneObject } from '../utils';
 import {
     MOCK_AUTH_DISALLOWS,
     MOCK_DEVICE_LIST,
@@ -33,62 +36,61 @@ import {
     MOCK_TRACK_STATE,
     MOCK_UNAUTH_DISALLOWS,
 } from './test.data';
-import { cloneObject } from '../utils';
+import { get } from 'svelte/store';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let mock_state: any;
+let mockState: any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let mock_devices: any[];
-let mock_auth: boolean = false;
+let mockDevices: any[];
+let mockAuth: boolean = false;
 
 const setGlobal = async (auth: boolean, stateType: string) => {
     switch (stateType) {
         case 'track':
-            mock_state = cloneObject(MOCK_TRACK_STATE);
+            mockState = cloneObject(MOCK_TRACK_STATE);
             break;
         case 'episode':
-            mock_state = cloneObject(MOCK_EPISODE_STATE);
+            mockState = cloneObject(MOCK_EPISODE_STATE);
             break;
         default:
-            mock_state = null;
+            mockState = null;
     }
-    mock_devices = cloneObject(MOCK_DEVICE_LIST);
+    mockDevices = cloneObject(MOCK_DEVICE_LIST);
+    mockAuth = auth;
 
-    await authenticated.set(auth);
-    await state.reload!();
-    await devices.reload!();
+    await reloadAll([authenticated, state, devices, activeDevice, progress]);
 };
 
-beforeEach(() => {
+beforeAll(() => {
     mockIPC((cmd, args) => {
         switch (cmd) {
             case 'is_authenticated':
-                return mock_auth;
+                return mockAuth;
             case 'authenticate':
-                mock_auth = true;
+                mockAuth = true;
                 return true;
             case 'deauthenticate':
-                mock_auth = false;
+                mockAuth = false;
                 return false;
             case 'get_playback_state':
-                return mock_state;
+                return mockState;
             case 'get_device_list':
-                return mock_devices;
+                return mockDevices;
             case 'set_device':
-                mock_state.device.id = args.deviceId as string;
-                mock_devices.forEach((dev) => (dev.is_active = dev.id === args.deviceId));
+                mockState.device.id = args.deviceId as string;
+                mockDevices.forEach((dev) => (dev.is_active = dev.id === args.deviceId));
                 break;
             case 'seek':
-                mock_state.progress_ms = args.progress as number;
+                mockState.progress_ms = args.progress as number;
                 break;
             case 'set_playing':
-                mock_state.is_playing = args.playState as boolean;
+                mockState.is_playing = args.playState as boolean;
                 break;
             case 'set_shuffle':
-                mock_state.shuffle_state = args.shuffleState as boolean;
+                mockState.shuffle_state = args.shuffleState as boolean;
                 break;
             case 'set_repeat':
-                mock_state.repeat_state = args.repeatState as RepeatState;
+                mockState.repeat_state = args.repeatState as RepeatState;
                 break;
             case 'set_liked':
                 // TODO
@@ -97,9 +99,8 @@ beforeEach(() => {
                 // TODO
                 break;
             case 'set_volume':
-                mock_state.device.volume_percent = args.volumePercent as number;
-                mock_devices.find((dev) => dev.id === mock_state.device.id).volume_percent =
-                    args.volumePercent as number;
+                mockState.device.volume_percent = args.volumePercent as number;
+                mockDevices.find((dev) => dev.id === mockState.device.id).volume_percent = args.volumePercent as number;
                 break;
         }
     });
@@ -113,7 +114,7 @@ const testWithScenarios = <T>(
         getWithEpisode?: { value: unknown };
         getWithAuth?: { value: unknown };
         getWithoutAuth?: { value: unknown };
-        setValue?: { value: T; expectedOutcome: () => Promise<boolean> };
+        setValue?: { value: T; expected: (value: T) => Promise<void> }[];
     }
 ) => {
     if (scenarios.getWithTrack)
@@ -141,12 +142,15 @@ const testWithScenarios = <T>(
             expect(value).toStrictEqual(scenarios.getWithoutAuth!.value);
         });
     if (scenarios.setValue) {
-        test(`Set ${label}`, async () => {
-            await setGlobal(true, 'track');
-            await (store as WritableLoadable<T>).set(scenarios.setValue!.value);
-            const outcome = await scenarios.setValue?.expectedOutcome();
-            expect(outcome).toBeTruthy();
-        });
+        Promise.all(
+            scenarios.setValue!.map(async (testValue): Promise<void> => {
+                test(`Set ${label}: ${testValue.value}`, async () => {
+                    await setGlobal(true, 'track');
+                    await (store as WritableLoadable<T>).set(testValue.value);
+                    testValue.expected(testValue.value);
+                });
+            })
+        );
     }
 };
 
@@ -170,59 +174,128 @@ describe('Interactive Data Stores', () => {
     testWithScenarios('active device', activeDevice, {
         getWithAuth: { value: MOCK_DEVICE_LIST[0].id },
         getWithoutAuth: { value: null },
-        setValue: {
-            value: 'test-device-id-2',
-            expectedOutcome: async () =>
-                mock_state.device.id === 'test-device-id-2' &&
-                mock_devices.find((dev) => dev.is_active).id === 'test-device-id-2',
-        },
+        setValue: [
+            {
+                value: 'test-device-id-1',
+                expected: async () => {
+                    expect(mockState.device.id).toBe('test-device-id-1');
+                    expect(mockDevices.find((dev) => dev.is_active).id).toBe('test-device-id-1');
+                },
+            },
+            {
+                value: 'test-device-id-2',
+                expected: async () => {
+                    expect(mockState.device.id).toBe('test-device-id-2');
+                    expect(mockDevices.find((dev) => dev.is_active).id).toBe('test-device-id-2');
+                },
+            },
+        ],
     });
     testWithScenarios('progress', progress, {
         getWithAuth: { value: MOCK_TRACK_STATE.progress_ms },
         getWithoutAuth: { value: 0 },
-        setValue: {
-            value: 10000,
-            expectedOutcome: async () => mock_state.progress_ms === 10000,
-        },
+        setValue: [
+            {
+                value: 10000,
+                expected: async () => expect(mockState.progress_ms).toBe(10000),
+            },
+            {
+                value: 100000,
+                expected: async () => expect(mockState.progress_ms).toBe(100000),
+            },
+        ],
+    });
+    testWithScenarios('displayed progress', displayedProgress, {
+        getWithAuth: { value: MOCK_TRACK_STATE.progress_ms },
+        getWithoutAuth: { value: 0 },
+        setValue: [
+            {
+                value: 10000,
+                expected: async () => {
+                    expect(mockState.progress_ms).toBe(MOCK_TRACK_STATE.progress_ms);
+                    expect(get(displayedProgress)).toBe(10000);
+                },
+            },
+            {
+                value: MOCK_TRACK_STATE.item.duration_ms + 10000,
+                expected: async () => {
+                    expect(mockState.progress_ms).toBe(MOCK_TRACK_STATE.progress_ms);
+                    expect(get(displayedProgress)).toBe(MOCK_TRACK_STATE.item.duration_ms);
+                    expect(get(loading)).toBe(true);
+                },
+            },
+        ],
     });
     testWithScenarios('playing', playing, {
         getWithAuth: { value: MOCK_TRACK_STATE.is_playing },
         getWithoutAuth: { value: false },
-        setValue: {
-            value: false,
-            expectedOutcome: async () => mock_state.is_playing === false,
-        },
+        setValue: [
+            {
+                value: false,
+                expected: async () => expect(mockState.is_playing).toBe(false),
+            },
+            {
+                value: true,
+                expected: async () => expect(mockState.is_playing).toBe(true),
+            },
+        ],
     });
     testWithScenarios('shuffle', shuffle, {
         getWithAuth: { value: MOCK_TRACK_STATE.shuffle_state },
         getWithoutAuth: { value: false },
-        setValue: {
-            value: false,
-            expectedOutcome: async () => mock_state.shuffle_state === false,
-        },
+        setValue: [
+            {
+                value: false,
+                expected: async () => expect(mockState.shuffle_state).toBe(false),
+            },
+            {
+                value: true,
+                expected: async () => expect(mockState.shuffle_state).toBe(true),
+            },
+        ],
     });
     testWithScenarios('repeat', repeat, {
         getWithAuth: { value: MOCK_TRACK_STATE.repeat_state },
         getWithoutAuth: { value: 'off' },
-        setValue: {
-            value: 'track',
-            expectedOutcome: async () => mock_state.repeat_state === 'track',
-        },
+        setValue: [
+            {
+                value: 'track',
+                expected: async () => expect(mockState.repeat_state).toBe('track'),
+            },
+            {
+                value: 'off',
+                expected: async () => expect(mockState.repeat_state).toBe('off'),
+            },
+            {
+                value: 'context',
+                expected: async () => expect(mockState.repeat_state).toBe('context'),
+            },
+        ],
     });
     testWithScenarios('liked', liked, {
         getWithoutAuth: { value: false },
         // getWithoutAuth: { value: //TODO },
-        // setValue: { value: //TODO , expectedOutcome: async () => // TODO },
+        // setValue: [{ value: //TODO , expected: async () => // TODO }],
     });
     testWithScenarios('volume', volume, {
         getWithAuth: { value: MOCK_DEVICE_LIST[0].volume_percent },
         getWithoutAuth: { value: 0 },
-        setValue: {
-            value: 100,
-            expectedOutcome: async () =>
-                mock_state.device.volume_percent === 100 &&
-                mock_devices.find((dev) => dev.is_active).volume_percent === 100,
-        },
+        setValue: [
+            {
+                value: 0,
+                expected: async () => {
+                    expect(mockState.device.volume_percent).toBe(0);
+                    expect(mockDevices.find((dev) => dev.is_active).volume_percent).toBe(0);
+                },
+            },
+            {
+                value: 100,
+                expected: async () => {
+                    expect(mockState.device.volume_percent).toBe(100);
+                    expect(mockDevices.find((dev) => dev.is_active).volume_percent).toBe(100);
+                },
+            },
+        ],
     });
 });
 
