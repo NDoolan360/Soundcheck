@@ -69,10 +69,7 @@
                 {#if dismissable}
                     <Button
                         id="dismiss-snackbar"
-                        color={{
-                            text: `var(--comp-snackbar-color-text,
-										rgb(var(--scheme-color-inverse-on-surface)))`,
-                        }}
+                        color={`var(--comp-snackbar-color-text, rgb(var(--scheme-color-inverse-on-surface)))`}
                         on:click={close}
                     >
                         <i slot="button-icon" class="material-symbols-outlined">close</i>

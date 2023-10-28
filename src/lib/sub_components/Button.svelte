@@ -3,7 +3,6 @@
 
     export let id: string;
     export let disabled = optional<boolean>();
-    export let FAB = optional<boolean>();
     export let filled = optional<boolean>();
     export let selected = optional<boolean>();
 
@@ -24,10 +23,9 @@
     style:--comp-button-size-radius={radius}
     style:--comp-button-color-text={color}
     style:--comp-button-color-background={backgroundColor}
-    class:fab={FAB}
     class:filled
     class:icon={$$slots['button-icon']}
-    class:selected={selected === true}
+    class:selected={selected !== false}
     {disabled}
     type="button"
     on:click
@@ -42,10 +40,10 @@
     button :global([slot='button-icon'].material-symbols-outlined) {
         font-size: 24px;
         font-variation-settings: 'FILL' 1;
-        transition: 0.4s;
+        transition: all 0.4s;
     }
 
-    button:not(.selected, .fab) :global([slot='button-icon'].material-symbols-outlined) {
+    button:not(.selected) :global([slot='button-icon'].material-symbols-outlined) {
         font-variation-settings: 'FILL' 0;
     }
 
@@ -115,23 +113,11 @@
         --_elevation: 1px;
     }
 
-    .fab {
-        border-radius: 50%;
-        transition: border-radius 0.4s;
-
-        --_width: 56px;
-        --_height: 56px;
-    }
-
-    .fab.selected {
-        border-radius: var(--corner-large);
-    }
-
     .icon {
         --_padding: 0;
     }
 
-    .icon.filled:not(.selected, .fab) {
+    .icon.filled:not(.selected) {
         --_text-color: var(--scheme-color-primary);
         --_background-color: var(--scheme-color-surface-container-highest);
     }
