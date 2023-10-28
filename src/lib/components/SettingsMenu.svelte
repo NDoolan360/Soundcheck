@@ -11,24 +11,20 @@
     import { onMount } from 'svelte';
 
     const closeMenu = () => ($menu = false);
+    const updateAlwaysOnTop = (value: boolean) => tauriWindow.appWindow.setAlwaysOnTop(value);
 
     let menu = writable(false);
     let triggerCopiedSnackbar: () => void;
 
     onMount(() => {
-        const unsubKeepOnTop = keepOnTop.subscribe((value) => {
-            tauriWindow.appWindow.setAlwaysOnTop(value);
-        });
-
         let autoReloadDevices: NodeJS.Timeout;
         invoke<number>('refresh_rate', {}).then((refresh_rate) => {
             autoReloadDevices = setInterval(reload, refresh_rate * 3, devices);
         });
-        return () => {
-            clearInterval(autoReloadDevices);
-            unsubKeepOnTop();
-        };
+        return () => clearInterval(autoReloadDevices);
     });
+
+    $: updateAlwaysOnTop($keepOnTop);
 </script>
 
 <div use:loseFocus={closeMenu}>
