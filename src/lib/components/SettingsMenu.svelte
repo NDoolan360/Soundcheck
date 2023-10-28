@@ -1,18 +1,34 @@
 <script lang="ts">
-    import { clipboard } from '@tauri-apps/api';
+    import { clipboard, invoke, window as tauriWindow } from '@tauri-apps/api';
     import { writable } from 'svelte/store';
     import { slide } from 'svelte/transition';
-    import Button from '../components/Button.svelte';
-    import Snackbar from '../components/Snackbar.svelte';
-    import Switch from '../components/Switch.svelte';
+    import Button from '../sub_components/Button.svelte';
+    import Snackbar from '../sub_components/Snackbar.svelte';
+    import Switch from '../sub_components/Switch.svelte';
     import { activeDevice, authenticated, deepLink, devices, disallows, songLink, volume } from '../playback';
     import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from '../settings';
-    import { loseFocus, toggle } from '../utils';
+    import { loseFocus, reload, toggle } from '../utils';
+    import { onMount } from 'svelte';
 
-    let menu = writable(false);
     const closeMenu = () => ($menu = false);
 
+    let menu = writable(false);
     let triggerCopiedSnackbar: () => void;
+
+    onMount(() => {
+        const unsubKeepOnTop = keepOnTop.subscribe((value) => {
+            tauriWindow.appWindow.setAlwaysOnTop(value);
+        });
+
+        let autoReloadDevices: NodeJS.Timeout;
+        invoke<number>('refresh_rate', {}).then((refresh_rate) => {
+            autoReloadDevices = setInterval(reload, refresh_rate * 3, devices);
+        });
+        return () => {
+            clearInterval(autoReloadDevices);
+            unsubKeepOnTop();
+        };
+    });
 </script>
 
 <div use:loseFocus={closeMenu}>

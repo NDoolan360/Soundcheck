@@ -7,11 +7,8 @@ export type RepeatState = 'track' | 'context' | 'off';
 
 export const authenticated = asyncWritable(
     [],
-    async () => await invoke<boolean>('is_authenticated'),
-    async (newAuth) =>
-        await invoke<boolean>(newAuth ? 'authenticate' : 'deauthenticate', {
-            window,
-        }),
+    () => invoke<boolean>('is_authenticated'),
+    (newAuth) => invoke<boolean>(newAuth ? 'authenticate' : 'deauthenticate', { window }),
     { reloadable: true, initial: false }
 );
 
@@ -63,32 +60,44 @@ export const deepLink = derived([currentType, trackId], ([$type, $trackId]) =>
 export const activeDevice = asyncWritable(
     state,
     async ($state) => $state?.device?.id ?? null,
-    async (newDeviceId) => invoke('set_device', { deviceId: newDeviceId }),
+    (newDeviceId) => invoke('set_device', { deviceId: newDeviceId }),
     { reloadable: true, initial: null }
 );
 
 export const progress = asyncWritable(
     state,
     async ($state) => $state?.progress_ms ?? 0,
-    async (newProgress) => invoke<void>('seek', { progress: newProgress }),
+    (newProgress) => invoke<void>('seek', { progress: newProgress }),
     { initial: 0 }
+);
+export const displayedProgress = asyncWritable(
+    [progress, duration],
+    ([$progress]) => $progress,
+    async (newValue, parents) => {
+        const $duration = parents![1];
+        if (newValue > $duration) {
+            loading.set(true);
+            return $duration;
+        }
+        return newValue;
+    }
 );
 export const playing = asyncWritable(
     state,
     async ($state) => $state?.is_playing ?? false,
-    async (newPlayState) => invoke<void>('set_playing', { playState: newPlayState }),
+    (newPlayState) => invoke<void>('set_playing', { playState: newPlayState }),
     { initial: false }
 );
 export const shuffle = asyncWritable(
     state,
     async ($state) => $state?.shuffle_state ?? false,
-    async (newShuffleState) => invoke<void>('set_shuffle', { shuffleState: newShuffleState }),
+    (newShuffleState) => invoke<void>('set_shuffle', { shuffleState: newShuffleState }),
     { initial: false }
 );
 export const repeat = asyncWritable(
     state,
     async ($state) => ($state?.repeat_state ?? 'off') as RepeatState,
-    async (newRepeatState) => invoke<void>('set_repeat', { repeatState: newRepeatState }),
+    (newRepeatState) => invoke<void>('set_repeat', { repeatState: newRepeatState }),
     { initial: 'off' as RepeatState }
 );
 export const liked = asyncWritable(
@@ -102,7 +111,7 @@ export const liked = asyncWritable(
 export const volume = asyncWritable(
     state,
     async ($state) => $state?.device?.volume_percent ?? 0,
-    async (newVolumePercent) => invoke<void>('set_volume', { volumePercent: newVolumePercent }),
+    (newVolumePercent) => invoke<void>('set_volume', { volumePercent: newVolumePercent }),
     { initial: 0 }
 );
 
