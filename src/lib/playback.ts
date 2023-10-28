@@ -68,7 +68,7 @@ export const progress = asyncWritable(
     state,
     async ($state) => $state?.progress_ms ?? 0,
     (newProgress) => invoke<void>('seek', { progress: newProgress }),
-    { initial: 0 }
+    { reloadable: true, initial: 0 }
 );
 export const displayedProgress = asyncWritable(
     [progress, duration],
