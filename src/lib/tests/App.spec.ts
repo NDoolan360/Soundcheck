@@ -9,9 +9,9 @@ global.fetch = vi.fn().mockImplementation(() =>
 ) as () => Promise<Response>;
 
 beforeEach(async () => {
-    alwaysShowControls.reset!();
-    alwaysShowArtwork.reset!();
-    artworkFillMode.reset!();
+    alwaysShowControls.set(false);
+    alwaysShowArtwork.set(false);
+    artworkFillMode.set('contain');
 });
 
 describe('Visual Settings', () => {

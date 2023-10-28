@@ -1,9 +1,8 @@
-import { asyncWritable, isReloadable, type Loadable, type Writable } from '@square/svelte-store';
+import { asyncWritable, isReloadable, writable, type Loadable, type Writable } from '@square/svelte-store';
 import { Store } from 'tauri-plugin-store-api';
 import type { RepeatState } from './playback';
 
-const inBrowser = window.__TAURI_IPC__ === undefined;
-export const testingMode = typeof process !== 'undefined' && process.env['MODE'] === 'test';
+export const inBrowser = window.__TAURI_IPC__ === undefined;
 
 export function optional<T>(): T | undefined {
     return undefined;
@@ -37,24 +36,19 @@ export const prettyTime = (rawTime: number) => {
 };
 
 export const newSettingStore = <T>(key: string, initial: T) => {
+    if (inBrowser) return writable(initial);
     const store = new Store('.soundcheck-settings.json');
     return asyncWritable<[], T>(
         [],
         async () => {
-            /* c8 ignore next 5 */
-            if (!inBrowser) {
-                if (await store.has(key)) return (await store.get<T>(key))!;
-                await store.set(key, initial);
-                store.save();
-            }
+            if (await store.has(key)) return (await store.get<T>(key))!;
+            await store.set(key, initial);
+            store.save();
             return initial;
         },
         async (value: T) => {
-            /* c8 ignore next 4 */
-            if (!inBrowser) {
-                await store.set(key, value);
-                store.save();
-            }
+            await store.set(key, value);
+            store.save();
             return value;
         },
         { initial }
