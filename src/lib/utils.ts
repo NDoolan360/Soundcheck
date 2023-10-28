@@ -1,4 +1,4 @@
-import { asyncWritable, isReloadable, writable, type Loadable, type Writable } from '@square/svelte-store';
+import { asyncWritable, writable, type Writable } from '@square/svelte-store';
 import { Store } from 'tauri-plugin-store-api';
 import type { RepeatState } from './playback';
 
@@ -66,8 +66,4 @@ export const nextRepeat = (curr: Writable<RepeatState>) => {
         track: 'off',
     } as { [name: string]: RepeatState };
     curr.update((val) => map[val]);
-};
-
-export const reload = <T>(loadbale: Loadable<T>, delay = 10, cb = () => {}) => {
-    setTimeout(() => isReloadable(loadbale) && loadbale.reload().then(cb), delay);
 };
