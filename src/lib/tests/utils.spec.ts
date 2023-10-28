@@ -1,4 +1,6 @@
-import { clamp, cloneObject, prettyTime } from '../utils';
+import { get, writable } from '@square/svelte-store';
+import type { RepeatState } from '../playback';
+import { clamp, cloneObject, nextRepeat, prettyTime, toggle } from '../utils';
 
 describe('Misc Helper Functions', () => {
     test('Clamp', () => {
@@ -19,5 +21,24 @@ describe('Misc Helper Functions', () => {
 
         expect(test.value).toBe(1);
         expect(test_clone.value).toBe(0);
+    });
+    test('Toggle', () => {
+        const mockStore = writable(false);
+
+        toggle(mockStore);
+        expect(get(mockStore)).toBe(true);
+
+        toggle(mockStore);
+        expect(get(mockStore)).toBe(false);
+    });
+    test('Get Next Repeat Value', () => {
+        const mockRepeatState = writable<RepeatState>('off');
+
+        nextRepeat(mockRepeatState);
+        expect(get(mockRepeatState)).toBe('context');
+        nextRepeat(mockRepeatState);
+        expect(get(mockRepeatState)).toBe('track');
+        nextRepeat(mockRepeatState);
+        expect(get(mockRepeatState)).toBe('off');
     });
 });
