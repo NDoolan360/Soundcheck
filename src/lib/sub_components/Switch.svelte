@@ -21,12 +21,12 @@
 
 <button
     style:--comp-switch-color-foreground-on={color.foreground?.checked}
-    style:--comp-switch-color-background-on={color.background?.checked}
+    style:--comp-switch-background-color-on={color.background?.checked}
     style:--comp-switch-color-foreground-off={color.foreground?.unchecked}
-    style:--comp-switch-color-background-off={color.background?.unchecked}
+    style:--comp-switch-background-color-off={color.background?.unchecked}
     style:--comp-switch-size-width={width}
     style:--comp-switch-size-height={height}
-    style:--comp-switch-size-radius={radius}
+    style:--comp-switch-shape-radius={radius}
     class:checked
     aria-checked={checked}
     aria-label={label}
@@ -58,8 +58,8 @@
         height: var(--_height);
         padding: 0;
         border: 2px solid var(--comp-switch-color-foreground-off, rgb(var(--scheme-color-outline)));
-        border-radius: var(--comp-switch-size-radius, var(--corner-full));
-        background-color: var(--comp-switch-color-background-off, rgb(var(--scheme-color-surface-container-highest)));
+        border-radius: var(--comp-switch-shape-radius, var(--corner-full));
+        background-color: var(--comp-switch-background-color-off, rgb(var(--scheme-color-surface-container-highest)));
         cursor: pointer;
         transition:
             outline-width 0s,
@@ -74,7 +74,7 @@
     button::before {
         position: absolute;
         border-radius: inherit;
-        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
+        background-color: var(--comp-switch-background-color-on, rgb(var(--scheme-color-primary)));
         content: '';
         inset: 0;
         opacity: 0;
@@ -99,11 +99,11 @@
 
     button.checked {
         border-color: transparent;
-        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
+        background-color: var(--comp-switch-background-color-on, rgb(var(--scheme-color-primary)));
     }
 
     button.checked::before {
-        background-color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
+        background-color: var(--comp-switch-background-color-on, rgb(var(--scheme-color-primary)));
     }
 
     button.checked:disabled {
@@ -127,13 +127,13 @@
     button span {
         left: 0;
         background-color: var(--comp-switch-color-foreground-off, rgb(var(--scheme-color-outline)));
-        color: var(--comp-switch-color-background-off, rgb(var(--scheme-color-surface-container-highest)));
+        color: var(--comp-switch-background-color-off, rgb(var(--scheme-color-surface-container-highest)));
     }
 
     button.checked span {
         left: calc(var(--_width) - var(--_height));
         background-color: var(--comp-switch-color-foreground-on, rgb(var(--scheme-color-on-primary)));
-        color: var(--comp-switch-color-background-on, rgb(var(--scheme-color-primary)));
+        color: var(--comp-switch-background-color-on, rgb(var(--scheme-color-primary)));
     }
 
     button span:not(.icon) {

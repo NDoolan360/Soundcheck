@@ -52,7 +52,7 @@
         style:--comp-snackbar-size-width={width}
         style:--comp-snackbar-color-text={color.text}
         style:--comp-snackbar-color-actions={color.text}
-        style:--comp-snackbar-color-background={color.background}
+        style:--comp-snackbar-background-color={color.background}
         class:has-actions={hasActions}
         aria-relevant="additions"
         role="status"
@@ -93,7 +93,7 @@
         justify-content: center;
         justify-content: start;
         border-radius: var(--corner-extra-small);
-        background-color: var(--comp-snackbar-color-background, rgb(var(--scheme-color-inverse-surface)));
+        background-color: var(--comp-snackbar-background-color, rgb(var(--scheme-color-inverse-surface)));
         box-shadow: 0 0 6px rgb(var(--scheme-color-shadow, 0 0 0));
         gap: 0;
         inset: auto 0 0;

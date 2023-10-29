@@ -20,9 +20,9 @@
     {id}
     style:--comp-button-size-height={height}
     style:--comp-button-size-width={width}
-    style:--comp-button-size-radius={radius}
-    style:--comp-button-color-text={color}
-    style:--comp-button-color-background={backgroundColor}
+    style:--comp-button-shape-radius={radius}
+    style:--comp-button-color={color}
+    style:--comp-button-background-color={backgroundColor}
     class:filled
     class:icon={$$slots['button-icon']}
     class:selected={selected !== false}
@@ -55,11 +55,11 @@
         align-items: center;
         justify-content: center;
         padding: var(--_padding, 0 24px);
-        border: var(--_border, none);
-        border-radius: var(--comp-button-size-radius, var(--_radius, var(--corner-full)));
-        background-color: var(--comp-button-color-background, rgb(var(--_background-color, transparent)));
+        border: none;
+        border-radius: var(--comp-button-shape-radius, var(--_radius, var(--corner-full)));
+        background-color: var(--comp-button-background-color, rgb(var(--_background-color, transparent)));
         box-shadow: 0 0 var(--_elevation, 0) rgb(var(--scheme-color-shadow));
-        color: var(--comp-button-color-text, rgb(var(--_text-color, white)));
+        color: var(--comp-button-color, rgb(var(--_color, white)));
         cursor: pointer;
         font-weight: 700;
         gap: 8px;
@@ -77,7 +77,7 @@
     button::before {
         position: absolute;
         border-radius: inherit;
-        background-color: var(--comp-button-color-text, rgb(var(--_text-color)));
+        background-color: var(--comp-button-color-text, rgb(var(--_color)));
         content: '';
         inset: 0;
         opacity: 0;
@@ -105,7 +105,7 @@
     }
 
     .filled {
-        --_text-color: var(--scheme-color-on-primary);
+        --_color: var(--scheme-color-on-primary);
         --_background-color: var(--scheme-color-primary);
     }
 
@@ -118,7 +118,7 @@
     }
 
     .icon.filled:not(.selected) {
-        --_text-color: var(--scheme-color-primary);
+        --_color: var(--scheme-color-primary);
         --_background-color: var(--scheme-color-surface-container-highest);
     }
 </style>
