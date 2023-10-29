@@ -16,6 +16,7 @@ dotenv-build = "0.1"
 [dependencies]
 tauri = { version = "1.5", features = [
     "clipboard-write-text",
+    "os-all",
     "window-close",
     "window-create",
     "window-set-always-on-top",
