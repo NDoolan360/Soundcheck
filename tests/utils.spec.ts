@@ -1,6 +1,6 @@
 import { get, writable } from '@square/svelte-store';
-import type { RepeatState } from '../playback';
-import { clamp, cloneObject, nextRepeat, prettyTime, toggle } from '../utils';
+import type { RepeatState } from '../src/lib/playback';
+import { clamp, cloneObject, nextRepeat, prettyTime, toggle } from '../src/lib/utils';
 
 describe('Misc Helper Functions', () => {
     test('Clamp', () => {

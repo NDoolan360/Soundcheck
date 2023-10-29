@@ -10,6 +10,6 @@
         "isolatedModules": true,
         "types": ["node", "spotify-api", "vitest/globals"]
     },
-    "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"],
+    "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte", "tests/**/*.ts"],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
-import App from '../../App.svelte';
-import { alwaysShowArtwork, alwaysShowControls, artworkFillMode } from '../settings';
+import App from '../src/App.svelte';
+import { alwaysShowArtwork, alwaysShowControls, artworkFillMode } from '../src/lib/settings';
 
 global.fetch = vi.fn().mockImplementation(() =>
     Promise.resolve({

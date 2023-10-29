@@ -23,8 +23,8 @@ import {
     volume,
     type RepeatState,
     loading,
-} from '../playback';
-import { cloneObject } from '../utils';
+} from '../src/lib/playback';
+import { cloneObject } from '../src/lib/utils';
 import {
     MOCK_AUTH_DISALLOWS,
     MOCK_DEVICE_LIST,
