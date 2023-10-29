@@ -2,41 +2,46 @@
     import { window as tauriWindow } from '@tauri-apps/api';
     import { type, type OsType } from '@tauri-apps/api/os';
     import Button from '../sub_components/Button.svelte';
+    import { onMount } from 'svelte';
+    import { inBrowser } from '../utils';
 
-    const getType = async () => {
-        const osType = await type();
-        const osMap: Record<OsType, 'mac-os' | 'windows' | 'linux'> = {
-            Darwin: 'mac-os',
-            Windows_NT: 'windows',
-            Linux: 'linux',
-        };
-        return osMap[osType];
+    type Os = 'mac-os' | 'windows' | 'linux';
+
+    const osMap: Record<OsType, Os> = {
+        Darwin: 'mac-os',
+        Windows_NT: 'windows',
+        Linux: 'linux',
     };
+
+    let os: Os;
+
+    onMount(async () => {
+        const osType = !inBrowser ? await type() : 'Windows_NT';
+        os = osMap[osType];
+    });
 </script>
 
-{#await getType() then type}
-    <aside class={type}>
-        <Button
-            id="close-button"
-            on:click={() => {
-                tauriWindow.WebviewWindow.getByLabel('player')?.close();
-                tauriWindow.WebviewWindow.getByLabel('auth')?.close();
-            }}
+<aside class={os}>
+    <Button
+        id="close-button"
+        on:click={() => {
+            tauriWindow.WebviewWindow.getByLabel('player')?.close();
+            tauriWindow.WebviewWindow.getByLabel('auth')?.close();
+        }}
+    >
+        <svg
+            slot="button-icon"
+            width={os === 'windows' ? 14 : os === 'linux' ? 8 : 8}
+            height={os === 'windows' ? 14 : os === 'linux' ? 8 : 8}
+            viewBox="0 0 10 10"
+            stroke="currentColor"
+            stroke-width={os === 'mac-os' ? 2.5 : 1}
         >
-            <svg
-                slot="button-icon"
-                width={type === 'windows' ? 14 : type === 'linux' ? 8 : 8}
-                height={type === 'windows' ? 14 : type === 'linux' ? 8 : 8}
-                viewBox="0 0 10 10"
-                stroke="currentColor"
-                stroke-width={type === 'mac-os' ? 2.5 : 1}
-            >
-                <path d="M 1.25,1.25 8.75,8.75" />
-                <path d="M 1.25,8.75 8.75,1.25" />
-            </svg>
-        </Button>
-    </aside>
-{/await}
+            <path d="M 1.25,1.25 8.75,8.75" />
+            <path d="M 1.25,8.75 8.75,1.25" />
+        </svg>
+    </Button>
+</aside>
 
 <style>
     aside {
