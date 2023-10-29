@@ -27,6 +27,6 @@
     }
 
     :global(#close-button:is(:hover, :focus-visible)) {
-        --comp-button-color-background: red;
+        --comp-button-background-color: red;
     }
 </style>
