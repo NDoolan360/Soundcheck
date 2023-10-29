@@ -159,9 +159,9 @@
     #menu {
         position: absolute;
         z-index: 9;
-        top: 2rem;
+        top: 2.75rem;
         max-width: calc(100vw - 2.5rem);
-        max-height: calc(100vh - 4rem);
+        max-height: calc(100vh - 4.5rem);
         padding: 0.5rem;
         border-radius: 0.25rem;
         background-color: rgb(var(--scheme-color-surface-container));
