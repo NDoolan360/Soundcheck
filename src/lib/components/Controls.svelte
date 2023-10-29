@@ -21,7 +21,6 @@
 
     export let width: number;
     export let hidePlayPause: boolean;
-
     onMount(() => {
         const optimiticProgressUpdate = setInterval(
             (delta: number) => {
@@ -32,16 +31,30 @@
         );
         return () => clearInterval(optimiticProgressUpdate);
     });
+
+    $: isEpisode = $currentType === 'episode';
+
+    $: controls = {
+        'replay-10': isEpisode,
+        'skip-previous': (!isEpisode && width > 150) || (isEpisode && width > 300),
+        'play-pause': !hidePlayPause,
+        progress: hidePlayPause || width > 250,
+        'skip-next': !isEpisode || (isEpisode && width > 200),
+        'forward-10': isEpisode && width > 150,
+        favorite: !isEpisode && width > 200,
+        shuffle: !isEpisode && width > 300,
+        repeat: !isEpisode && width > 350,
+    };
 </script>
 
-{#if $currentType === 'episode'}
+{#if controls['replay-10']}
     <span in:fade>
         <Button id="replay-10" on:click={() => ($progress = $progress - 10000)} disabled={$disallows.seeking}>
             <i slot="button-icon" class="material-symbols-outlined"> replay_10 </i>
         </Button>
     </span>
 {/if}
-{#if ($currentType === 'episode' && width > 300) || width > 135}
+{#if controls['skip-previous']}
     <span in:fade>
         <Button
             id="skip-previous"
@@ -52,7 +65,7 @@
         </Button>
     </span>
 {/if}
-{#if !hidePlayPause}
+{#if controls['play-pause']}
     <span in:fade>
         <Button id="play-pause" on:click={() => toggle(playing)} disabled={$disallows.playPause}>
             <i slot="button-icon" class="material-symbols-outlined">
@@ -65,7 +78,7 @@
         </Button>
     </span>
 {/if}
-{#if width > 200}
+{#if controls['progress']}
     <span id="progress" in:fade>
         <ProgressBar
             playing={$playing}
@@ -76,7 +89,7 @@
         />
     </span>
 {/if}
-{#if ($currentType === 'episode' && width > 250) || width > 100}
+{#if controls['skip-next']}
     <span in:fade>
         <Button
             id="skip-next"
@@ -87,52 +100,51 @@
         </Button>
     </span>
 {/if}
-{#if $currentType === 'track'}
-    {#if width > 250}
-        <span in:fade>
-            <Button
-                id="favorite"
-                filled
-                selected={$liked}
-                on:click={() => toggle(liked)}
-                disabled={$disallows.togglingLike}
-            >
-                <i slot="button-icon" class="material-symbols-outlined"> favorite </i>
-            </Button>
-        </span>
-    {/if}
-    {#if width > 300}
-        <span in:fade>
-            <Button
-                id="shuffle"
-                filled
-                selected={$shuffle}
-                on:click={() => toggle(shuffle)}
-                disabled={$disallows.togglingShuffle}
-            >
-                <i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
-            </Button>
-        </span>
-    {/if}
-    {#if width > 350}
-        <span in:fade>
-            <Button
-                id="repeat"
-                filled
-                selected={$repeat != 'off'}
-                on:click={() => nextRepeat(repeat)}
-                disabled={$disallows.togglingRepeat}
-            >
-                <i slot="button-icon" class="material-symbols-outlined">
-                    {$repeat == 'track' ? 'repeat_one' : 'repeat'}
-                </i>
-            </Button>
-        </span>
-    {/if}
-{:else if $currentType === 'episode'}
+{#if controls['forward-10']}
     <span in:fade>
         <Button id="forward-10" on:click={() => ($progress = $progress + 10000)} disabled={$disallows.seeking}>
             <i slot="button-icon" class="material-symbols-outlined"> forward_10 </i>
+        </Button>
+    </span>
+{/if}
+{#if controls['favorite']}
+    <span in:fade>
+        <Button
+            id="favorite"
+            filled
+            selected={$liked}
+            on:click={() => toggle(liked)}
+            disabled={$disallows.togglingLike}
+        >
+            <i slot="button-icon" class="material-symbols-outlined"> favorite </i>
+        </Button>
+    </span>
+{/if}
+{#if controls['shuffle']}
+    <span in:fade>
+        <Button
+            id="shuffle"
+            filled
+            selected={$shuffle}
+            on:click={() => toggle(shuffle)}
+            disabled={$disallows.togglingShuffle}
+        >
+            <i slot="button-icon" class="material-symbols-outlined"> shuffle </i>
+        </Button>
+    </span>
+{/if}
+{#if controls['repeat']}
+    <span in:fade>
+        <Button
+            id="repeat"
+            filled
+            selected={$repeat != 'off'}
+            on:click={() => nextRepeat(repeat)}
+            disabled={$disallows.togglingRepeat}
+        >
+            <i slot="button-icon" class="material-symbols-outlined">
+                {$repeat == 'track' ? 'repeat_one' : 'repeat'}
+            </i>
         </Button>
     </span>
 {/if}
@@ -149,7 +161,6 @@
     }
 
     #progress {
-        min-width: 3.5rem;
         flex: 1 1;
     }
 </style>

@@ -43,7 +43,9 @@
             });
     }
 
-    $: playPauseAsFAB = screenWidth > 200 && screenHeight > 165;
+    $: showSettings = screenHeight > 85;
+    $: showSongInfo = screenHeight > 150;
+    $: playPauseAsFAB = screenWidth > 200 && showSongInfo;
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} bind:innerHeight={screenHeight} />
@@ -54,13 +56,13 @@
 {#if screenActive || $alwaysShowControls}
     <div id="vignette" transition:fade />
     <main data-tauri-drag-region transition:fade>
-        {#if screenHeight > 85}
+        {#if showSettings}
             <section>
                 <SettingsMenu />
                 <CloseButton />
             </section>
         {/if}
-        {#if screenHeight > 125}
+        {#if showSongInfo}
             <section>
                 <SongInfo />
                 {#if playPauseAsFAB}
