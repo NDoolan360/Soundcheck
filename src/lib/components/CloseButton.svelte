@@ -50,6 +50,10 @@
         right: 0;
     }
 
+    :global(#close-button::before) {
+        opacity: 0 !important;
+    }
+
     :global(.windows #close-button) {
         --comp-button-size-height: 2rem;
         --comp-button-size-width: 3rem;

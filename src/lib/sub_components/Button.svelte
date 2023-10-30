@@ -59,7 +59,7 @@
         border-radius: var(--comp-button-shape-radius, var(--_radius, var(--corner-full)));
         background-color: var(--comp-button-background-color, rgb(var(--_background-color, transparent)));
         box-shadow: 0 0 var(--_elevation, 0) rgb(var(--scheme-color-shadow));
-        color: var(--comp-button-color, rgb(var(--_color, white)));
+        color: var(--comp-button-color, rgb(var(--_color)));
         cursor: pointer;
         font-weight: 700;
         gap: 8px;
@@ -77,7 +77,7 @@
     button::before {
         position: absolute;
         border-radius: inherit;
-        background-color: var(--comp-button-color-text, rgb(var(--_color)));
+        background-color: var(--comp-button-color, rgb(var(--_color)));
         content: '';
         inset: 0;
         opacity: 0;
@@ -102,6 +102,10 @@
 
         --_elevation: 0px;
         --_background-color: transparent;
+    }
+
+    :not(.filled) {
+        --_color: 255 255 255;
     }
 
     .filled {
