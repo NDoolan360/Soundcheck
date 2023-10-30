@@ -13,13 +13,28 @@ export const authenticated = asyncWritable(
 );
 
 export const loading = writable(false);
+let lastState: State;
 
 export const state = asyncDerived(
     authenticated,
     async ($auth) => {
         if ($auth) {
             loading.set(false);
-            return await invoke<State>('get_playback_state');
+            const state = await invoke<State>('get_playback_state');
+            // Default case where a playback state is returned
+            if (state) {
+                lastState = state;
+            }
+            // Case for inactive state reached
+            else if (lastState?.device?.id) {
+                loading.set(true);
+                // Set device to the current device to reset the inactivity timer
+                invoke('set_device', { deviceId: lastState.device.id });
+                // Set lastState to null so if the state is genuinenly disconnected,
+                // we can return to null state.
+                lastState = null;
+            }
+            return state ?? lastState;
         }
         return null;
     },
