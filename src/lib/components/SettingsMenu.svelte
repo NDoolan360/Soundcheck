@@ -6,7 +6,7 @@
     import Snackbar from '../sub_components/Snackbar.svelte';
     import Switch from '../sub_components/Switch.svelte';
     import { activeDevice, authenticated, deepLink, devices, disallows, songLink, volume } from '../playback';
-    import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, darkMode, keepOnTop } from '../settings';
+    import { alwaysShowArtwork, alwaysShowControls, artworkFillMode, keepOnTop } from '../settings';
     import { loseFocus, toggle, inBrowser } from '../utils';
     import { onMount } from 'svelte';
 
@@ -75,13 +75,6 @@
             <Button id="deep-link" filled href={$deepLink} disabled={$disallows.link}>Open in Spotify</Button>
             <hr />
             <h3>Settings</h3>
-            <span>
-                <label for="dark-mode">Dark Mode:</label>
-                <Switch label="dark-mode" bind:checked={$darkMode}>
-                    <i slot="switch-unchecked-icon" class="material-symbols-outlined"> light_mode </i>
-                    <i slot="switch-checked-icon" class="material-symbols-outlined"> dark_mode </i>
-                </Switch>
-            </span>
             <span>
                 <label for="keep-on-top">Keep On Top:</label>
                 <Switch label="keep-on-top" bind:checked={$keepOnTop}>
