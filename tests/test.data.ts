@@ -3,6 +3,8 @@ export const MOCK_TRACK_DEEP_LINK = 'spotify://track/5uuJruktM9fMdN9Va0DUMl';
 export const MOCK_EPISODE_SONG_LINK = 'https://open.spotify.com/episode/1zcBdrDgFKaCLfqYw0RM55';
 export const MOCK_EPISODE_DEEP_LINK = 'spotify://episode/1zcBdrDgFKaCLfqYw0RM55';
 
+export const MOCK_LIKED_SONGS = ['5uuJruktM9fMdN9Va0DUMl'];
+
 export const MOCK_AUTH_DISALLOWS = {
     changeVolume: false,
     interruptingPlayback: false,
@@ -120,6 +122,12 @@ export const MOCK_TRACK_STATE = {
     repeat_state: 'track',
     shuffle_state: true,
     timestamp: 0,
+};
+
+export const MOCK_NOT_LIKED_TRACK_STATE = {
+    item: {
+        id: '5CuUKQ84YDMCfMRsGrLZfM',
+    },
 };
 
 export const MOCK_EPISODE_STATE = {

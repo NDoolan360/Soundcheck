@@ -31,6 +31,8 @@ import {
     MOCK_EPISODE_DEEP_LINK,
     MOCK_EPISODE_SONG_LINK,
     MOCK_EPISODE_STATE,
+    MOCK_LIKED_SONGS,
+    MOCK_NOT_LIKED_TRACK_STATE,
     MOCK_TRACK_DEEP_LINK,
     MOCK_TRACK_SONG_LINK,
     MOCK_TRACK_STATE,
@@ -42,6 +44,7 @@ import { get } from 'svelte/store';
 let mockState: any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockDevices: any[];
+let mockLikedTracks: Set<string>;
 let mockAuth: boolean = false;
 
 const setGlobal = async (auth: boolean, stateType: string) => {
@@ -52,10 +55,14 @@ const setGlobal = async (auth: boolean, stateType: string) => {
         case 'episode':
             mockState = cloneObject(MOCK_EPISODE_STATE);
             break;
+        case 'not_liked':
+            mockState = cloneObject(MOCK_NOT_LIKED_TRACK_STATE);
+            break;
         default:
             mockState = null;
     }
     mockDevices = cloneObject(MOCK_DEVICE_LIST);
+    mockLikedTracks = new Set(cloneObject(MOCK_LIKED_SONGS) as string[]);
     mockAuth = auth;
 
     await reloadAll([authenticated, state, devices, activeDevice, progress]);
@@ -93,11 +100,14 @@ beforeAll(() => {
                 mockState.repeat_state = args.repeatState as RepeatState;
                 break;
             case 'set_liked':
-                // TODO
+                if (args.likedState as boolean) {
+                    mockLikedTracks.add(args.trackId as string);
+                } else {
+                    mockLikedTracks.delete(args.trackId as string);
+                }
                 break;
             case 'check_liked':
-                // TODO
-                break;
+                return mockLikedTracks.has(args.trackId as string);
             case 'set_volume':
                 mockState.device.volume_percent = args.volumePercent as number;
                 mockDevices.find((dev) => dev.id === mockState.device.id).volume_percent = args.volumePercent as number;
@@ -115,7 +125,8 @@ const testWithScenarios = <T>(
         getWithAuth?: { value: unknown };
         getWithoutAuth?: { value: unknown };
         setValue?: { value: T; expected: (value: T) => Promise<void> }[];
-    }
+    },
+    state = 'track'
 ) => {
     if (scenarios.getWithTrack)
         test(`Get ${label} with track state`, async () => {
@@ -131,13 +142,13 @@ const testWithScenarios = <T>(
         });
     if (scenarios.getWithAuth)
         test(`Get ${label} with auth`, async () => {
-            await setGlobal(true, 'track');
+            await setGlobal(true, state);
             const value = await store.load();
             expect(value).toStrictEqual(scenarios.getWithAuth!.value);
         });
     if (scenarios.getWithoutAuth)
         test(`Get ${label} without auth`, async () => {
-            await setGlobal(false, 'track');
+            await setGlobal(false, state);
             const value = await store.load();
             expect(value).toStrictEqual(scenarios.getWithoutAuth!.value);
         });
@@ -145,7 +156,7 @@ const testWithScenarios = <T>(
         Promise.all(
             scenarios.setValue!.map(async (testValue): Promise<void> => {
                 test(`Set ${label}: ${testValue.value}`, async () => {
-                    await setGlobal(true, 'track');
+                    await setGlobal(true, state);
                     await (store as WritableLoadable<T>).set(testValue.value);
                     testValue.expected(testValue.value);
                 });
@@ -274,9 +285,37 @@ describe('Interactive Data Stores', () => {
     });
     testWithScenarios('liked', liked, {
         getWithoutAuth: { value: false },
-        // getWithoutAuth: { value: //TODO },
-        // setValue: [{ value: //TODO , expected: async () => // TODO }],
+        getWithAuth: { value: true },
+        setValue: [
+            {
+                value: false,
+                expected: async () => expect(!mockLikedTracks.has(MOCK_TRACK_STATE.item.id)).toBe(true),
+            },
+            {
+                value: true,
+                expected: async () => expect(mockLikedTracks.has(MOCK_TRACK_STATE.item.id)).toBe(true),
+            },
+        ],
     });
+    testWithScenarios(
+        'not liked',
+        liked,
+        {
+            getWithoutAuth: { value: false },
+            getWithAuth: { value: false },
+            setValue: [
+                {
+                    value: false,
+                    expected: async () => expect(!mockLikedTracks.has(MOCK_NOT_LIKED_TRACK_STATE.item.id)).toBe(true),
+                },
+                {
+                    value: true,
+                    expected: async () => expect(mockLikedTracks.has(MOCK_NOT_LIKED_TRACK_STATE.item.id)).toBe(true),
+                },
+            ],
+        },
+        'not_liked'
+    );
     testWithScenarios('volume', volume, {
         getWithAuth: { value: MOCK_DEVICE_LIST[0].volume_percent },
         getWithoutAuth: { value: 0 },
