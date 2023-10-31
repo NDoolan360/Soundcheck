@@ -1,4 +1,5 @@
 import App from './App.svelte';
+import './lib/keyboard.ts';
 
 const app = new App({
     target: document.getElementById('app')!,
@@ -8,14 +9,5 @@ const app = new App({
 document.body.addEventListener('mousedown', () => {
     (document.activeElement as HTMLElement).blur();
 });
-
-window.onkeydown = function (e) {
-    // Prevent reload and known external dialogs.
-    if (
-        (e.ctrlKey && ['f', 'g', 'p', 'r', 'u'].includes(e.key.toLowerCase())) ||
-        ['f3', 'f5'].includes(e.key.toLowerCase())
-    )
-        e.preventDefault();
-};
 
 export default app;
