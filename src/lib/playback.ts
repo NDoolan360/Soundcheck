@@ -1,6 +1,8 @@
 import { asyncDerived, asyncWritable, derived, writable } from '@square/svelte-store';
 import { invoke, window } from '@tauri-apps/api';
 import ambient from '/ambient.gif?url';
+import { get } from 'svelte/store';
+import { clamp } from './utils';
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = 'track' | 'context' | 'off';
@@ -82,7 +84,7 @@ export const activeDevice = asyncWritable(
 export const progress = asyncWritable(
     state,
     async ($state) => $state?.progress_ms ?? 0,
-    (newProgress) => invoke<void>('seek', { progress: newProgress }),
+    (newProgress) => invoke<void>('seek', { progress: clamp(0, newProgress, get(duration)) }),
     { reloadable: true, initial: 0 }
 );
 export const displayedProgress = asyncWritable(
@@ -90,11 +92,8 @@ export const displayedProgress = asyncWritable(
     ([$progress]) => $progress,
     async (newValue, parents) => {
         const $duration = parents![1];
-        if (newValue > $duration) {
-            loading.set(true);
-            return $duration;
-        }
-        return newValue;
+        if (newValue > $duration) loading.set(true);
+        return clamp(0, newValue, $duration);
     }
 );
 export const playing = asyncWritable(
@@ -126,7 +125,7 @@ export const liked = asyncWritable(
 export const volume = asyncWritable(
     state,
     async ($state) => $state?.device?.volume_percent ?? 0,
-    (newVolumePercent) => invoke<void>('set_volume', { volumePercent: newVolumePercent }),
+    (newVolumePercent) => invoke<void>('set_volume', { volumePercent: clamp(0, newVolumePercent, 100) }),
     { initial: 0 }
 );
 

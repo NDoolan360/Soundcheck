@@ -200,8 +200,8 @@ describe('Interactive Data Stores', () => {
                 expected: async () => expect(mockState.progress_ms).toBe(10000),
             },
             {
-                value: 100000,
-                expected: async () => expect(mockState.progress_ms).toBe(100000),
+                value: 10000000,
+                expected: async () => expect(mockState.progress_ms).toBe(MOCK_TRACK_STATE.item.duration_ms),
             },
         ],
     });
