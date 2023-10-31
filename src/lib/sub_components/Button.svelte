@@ -5,6 +5,7 @@
     export let disabled = optional<boolean>();
     export let filled = optional<boolean>();
     export let selected = optional<boolean>();
+    export let href = optional<string>();
 
     export let slot = optional<string>();
 
@@ -16,6 +17,9 @@
     export let backgroundColor = optional<string>();
 </script>
 
+{#if href}
+    <a id="{id}-anchor" hidden aria-labelledby={id} {href}>.</a>
+{/if}
 <button
     {id}
     style:--comp-button-size-height={height}
@@ -26,11 +30,12 @@
     class:filled
     class:icon={$$slots['button-icon']}
     class:selected={selected !== false}
+    aria-hidden={href !== undefined}
     {disabled}
     type="button"
     on:click
+    on:click={() => href && document.getElementById(`${id}-anchor`)?.click()}
     {...{ slot }}
-    {...$$restProps}
 >
     <slot name="button-icon" />
     <slot />
