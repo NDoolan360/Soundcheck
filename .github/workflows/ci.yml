@@ -2,15 +2,6 @@ name: Continuous Integration
 
 on:
     workflow_dispatch:
-<<<<<<< HEAD
-      inputs:
-        environment:
-          description: environment
-          type: string
-          default: DEV
-          required: true
-=======
->>>>>>> 0cd292cab2004ed1f45e4660323f96decdc0e43a
     push:
         branches:
             - main
