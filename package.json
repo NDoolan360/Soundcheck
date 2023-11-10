@@ -18,7 +18,7 @@
         "eslint": "eslint --fix --ignore-path .gitignore **/*.{ts,svelte}"
     },
     "devDependencies": {
-        "@sveltejs/vite-plugin-svelte": "^2.4.6",
+        "@sveltejs/vite-plugin-svelte": "^2.5.1",
         "@testing-library/svelte": "^4.0.5",
         "@tsconfig/svelte": "^5.0.2",
         "@types/spotify-api": "^0.0.25",
