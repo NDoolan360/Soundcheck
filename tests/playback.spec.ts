@@ -358,7 +358,7 @@ describe('Derived Stores', () => {
             value: [
                 {
                     height: 361,
-                    url: '/ambient.gif',
+                    url: '/ambient.svg',
                     width: 361,
                 },
             ],

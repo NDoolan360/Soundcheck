@@ -1,6 +1,6 @@
 import { asyncDerived, asyncWritable, derived, writable } from '@square/svelte-store';
 import { invoke, window } from '@tauri-apps/api';
-import ambient from '/ambient.gif?url';
+import ambient from '/ambient.svg?url';
 import { get } from 'svelte/store';
 import { clamp } from './utils';
 

@@ -6,11 +6,11 @@ updates:
       schedule:
           interval: 'weekly'
       labels:
-          - 'type: chore'
+          - chore
     # Cargo
     - package-ecosystem: 'cargo'
       directory: '/src-tauri'
       schedule:
           interval: 'weekly'
       labels:
-          - 'type: chore'
+          - chore
