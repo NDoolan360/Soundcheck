@@ -1,6 +1,6 @@
 import { asyncDerived, asyncWritable, derived } from '@square/svelte-store';
 import { invoke, window } from '@tauri-apps/api';
-import ambient from '/ambient.gif?url';
+import ambient from '/ambient.svg?url';
 
 type State = SpotifyApi.CurrentPlaybackResponse | null;
 export type RepeatState = 'track' | 'context' | 'off';

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 619 619">
+  <style>
+    .st0{fill:url(#SVGID_1_);}
+    .st1,.st2{fill:none;stroke:#12102C;stroke-miterlimit:10;}
+    .st2{stroke-width:15;stroke-linecap:round;}
+  </style>
+  <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="125.0864" y1="87.093"
+    x2="740.9206" y2="829.6641">
+    <stop offset="0" style="stop-color:#50AA8F" />
+    <stop offset="0.0773" style="stop-color:#4DA58E" />
+    <stop offset="0.1809" style="stop-color:#43988B" />
+    <stop offset="0.2992" style="stop-color:#358587" />
+    <stop offset="0.4277" style="stop-color:#226D81" />
+    <stop offset="0.519" style="stop-color:#0F5B7B" />
+    <stop offset="0.6954" style="stop-color:#07475F" />
+    <stop offset="0.8375" style="stop-color:#00394D" />
+  </linearGradient>
+  <rect class="st0" width="619.4" height="619.4" />
+  <!-- Top -->
+  <line class="st2" x1="255.05" y1="289.74" x2="255.05" y2="219.4">
+    <animate attributeName="y2" values="219.4;197.06;242.26;225.15;219.4" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="291.35" y1="289.74" x2="291.35" y2="197.06">
+    <animate attributeName="y2" values="197.06;242.26;225.15;219.4;197.06" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="327.65" y1="289.74" x2="327.65" y2="242.26">
+    <animate attributeName="y2" values="242.26;225.15;219.4;197.06;242.26" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="363.95" y1="289.74" x2="363.95" y2="225.15">
+    <animate attributeName="y2" values="225.15;219.4;197.06;242.26;225.15" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <!-- Bottom -->
+  <line class="st2" x1="255.45" y1="329.66" x2="255.45" y2="394.26">
+    <animate attributeName="y2" values="394.26;400;422.34;377.15;394.26" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="291.75" y1="329.66" x2="291.75" y2="377.15">
+    <animate attributeName="y2" values="377.15;394.26;400;422.34;377.15" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="328.06" y1="329.66" x2="328.06" y2="422.34">
+    <animate attributeName="y2" values="422.34;377.15;394.26;400;422.34" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+  <line class="st2" x1="364.36" y1="329.66" x2="364.36" y2="400">
+    <animate attributeName="y2" values="400;422.34;377.15;394.26;400" dur="3s"
+      repeatCount="indefinite" />
+  </line>
+</svg>

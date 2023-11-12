@@ -1,6 +1,6 @@
 <div align="center">
   
-![Logo](./public/icons/128x128@2x.png)
+![Logo](./public/logo.png)
 
 **Soundcheck**, a desktop Spotify mini player.
 
