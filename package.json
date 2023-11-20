@@ -22,7 +22,7 @@
         "@testing-library/svelte": "^4.0.5",
         "@tsconfig/svelte": "^5.0.2",
         "@types/spotify-api": "^0.0.25",
-        "@typescript-eslint/eslint-plugin": "^6.10.0",
+        "@typescript-eslint/eslint-plugin": "^6.11.0",
         "@typescript-eslint/parser": "^6.10.0",
         "eslint": "^8.53.0",
         "eslint-plugin-svelte": "^2.35.0",
