@@ -1,6 +1,6 @@
 <div align="center">
   
-![Logo](./public/icons/128x128@2x.png)
+![Logo](./public/logo.png)
 
 **Soundcheck**, a desktop Spotify mini player.
 
@@ -11,6 +11,13 @@
 </div>
 
 ---
+
+## What is Soundcheck?
+
+![Screenshots](./public/docs/screenshots.png)
+
+Soundcheck is a lightweight, cross-platform and user-friendly desktop application that brings Spotify to your fingertips. With this app, you can seamlessly control Spotify, right from a minimal desktop app, without the need to open a web browser or the official Spotify app.
+Packaged in a compact and unobtrusive user interface that can stay on your desktop for quick access to your music playback.
 
 ## Development
 
@@ -76,6 +83,10 @@ For more information about building applications for different platforms check o
 Options specified in the `.env` file that determine varying behaviour of builds.
 
 -   `REFRESH_RATE`: The frequency that the playback state is refreshed (in ms). [Default: `5000`]
+
+## Maintenance
+
+Soundcheck is a personal project developed out of a passion for music listening and software development. While I'm dedicated to ensuring that the app works to the best of my ability, please be aware that, as a personal project, ongoing maintenance and updates may be infrequent.
 
 ## License
 

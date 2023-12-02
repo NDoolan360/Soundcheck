@@ -1,9 +1,4 @@
-import { enableStoreTestingMode } from '@square/svelte-store';
-import { newSettingStore, testingMode } from './utils';
-
-if (testingMode) {
-    enableStoreTestingMode();
-}
+import { newSettingStore } from './utils';
 
 export const darkMode = newSettingStore('darkMode', true);
 export const keepOnTop = newSettingStore('keepOnTop', true);
