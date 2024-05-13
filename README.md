@@ -12,6 +12,12 @@
 
 ---
 
+## Archived
+
+Archived as I have not really worked on this in a long while. In that time Spotify released their own [desktop miniplayer](https://community.spotify.com/t5/Community-Blog/Introducing-the-Spotify-Miniplayer-to-Spotify-Desktop/ba-p/5956132). This doesn't quite fill the same purpose I had set out for in this project so I may pick it up again. 
+
+---
+
 ## Development
 
 If you want to run this project on your local system, see below.
